@@ -1,4 +1,4 @@
-name: CI-cpp
+name: CI-cpp-centos7
 
 on: [push]
 
@@ -127,7 +127,9 @@ jobs:
       - name: Build
         run: |
           source /opt/rh/devtoolset-9/enable
-          ${{ runner.workspace }}/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
+          ${{ runner.workspace }}/build-wrapper-linux-x86/build-wrapper-linux-x86-64 
+          --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output 
+          cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
 
       - name: Tests
         run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 --output-on-failure
