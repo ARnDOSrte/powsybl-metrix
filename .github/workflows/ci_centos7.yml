@@ -78,11 +78,9 @@ jobs:
     container: 'centos:centos7'
     steps:
       - name: Download artifacts
-        if: ${{ env.RELEASE_CREATED == 'true' }}
         uses: actions/download-artifact@v3
 
       - name: Publish assets
-        if:  ${{ env.RELEASE_CREATED == 'true' }}
         uses: alexellis/upload-assets@0.4.0
         env:
           GITHUB_TOKEN: ${{ github.token }}
