@@ -61,7 +61,7 @@ jobs:
         run: |
           ARCHIVE_NAME="metrix-simulator.zip"
           ARCHIVE_PATH="$PWD/${ARCHIVE_NAME}"
-          zip -r $ARCHIVE_PATH ./build-linux/metrix-simulator
+          zip $ARCHIVE_PATH /__w/powsybl-metrix/powsybl-metrix/metrix-simulator/build-linux/install/bin/metrix-simulator
           echo "::set-output name=archive_name::$ARCHIVE_NAME"
           echo "::set-output name=archive_path::$ARCHIVE_PATH"
 
