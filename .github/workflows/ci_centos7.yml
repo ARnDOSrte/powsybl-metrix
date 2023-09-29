@@ -75,7 +75,6 @@ jobs:
     name: Publish release assets
     needs: linux
     runs-on: ubuntu-latest
-    container: 'centos:centos7'
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
