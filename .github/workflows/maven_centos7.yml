@@ -27,8 +27,6 @@ jobs:
           tar xzvf apache-maven-3.9.4-bin.tar.gz
 
       - name: Build with Maven
-        # env:
-        #   PATH: ${{ env.PATH }}:$GITHUB_WORKSPACE/apache-maven-3.9.4/bin
         run: |
           export PATH=$PATH:$(pwd)/apache-maven-3.9.4/bin
           mvn --batch-mode package
