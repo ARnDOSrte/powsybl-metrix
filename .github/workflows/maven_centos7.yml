@@ -1,4 +1,4 @@
-name: CI
+name: CI_centos7
 
 on: [push]
 
@@ -16,10 +16,17 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      
+      - name: Set-up Maven
+        run: |
+          wget https://dlcdn.apache.org/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz
+          tar xzvf apache-maven-3.9.4-bin.tar.gz
           
       - name: Checkout sources
         uses: actions/checkout@v1
 
       - name: Build with Maven
+        env:
+          PATH: ${{ env.PATH }}:$GITHUB_WORKSPACE/apache-maven-3.9.4/bin
         run: mvn --batch-mode package
 
