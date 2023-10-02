@@ -79,7 +79,8 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
 
-      - name: Publish assets
-        uses: alexellis/upload-assets@0.4.0
-        with:
-          asset_paths: '["*.zip"]'
+      - name: Step 3 - Use the Upload Artifact GitHub Action
+        uses: actions/upload-artifact@v2
+        with: 
+          name: metrix-simulator.zip
+          path: /home/runner/work/powsybl-metrix/powsybl-metrix/metrix-simulator.zip
