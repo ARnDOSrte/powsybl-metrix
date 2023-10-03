@@ -49,9 +49,7 @@ jobs:
           java-version: 11
 
       - name: Install gcovr
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y gcovr
+        run: sudo pip install gcovr
 
       - name: Install Sonar wrapper
         working-directory: ${{ runner.workspace }}
@@ -90,7 +88,6 @@ jobs:
           cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
           -DCMAKE_BUILD_TYPE=Debug
           -DCODE_COVERAGE=TRUE
-          -DMETRIX_RUN_ALL_TESTS=OFF
           -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
 
       - name: Build
