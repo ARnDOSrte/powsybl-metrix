@@ -57,6 +57,10 @@ jobs:
       # - name: Tests
       #   run: cd $GITHUB_WORKSPACE/metrix-simulator/build-linux && ctest -j2 --output-on-failure
       - name: Prepare Metrix install
+        on:
+        push:
+          tags:
+            - '*'
         id: metrix-install
         run: |
           ARCHIVE_NAME="metrix-simulator.zip"
@@ -66,6 +70,10 @@ jobs:
           echo "::set-output name=archive_path::$ARCHIVE_PATH"
 
       - name: Upload OR-Tools install artifact
+        on:
+        push:
+          tags:
+            - '*'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.metrix-install.outputs.archive_name }}
@@ -75,6 +83,10 @@ jobs:
     name: Publish release assets
     needs: linux
     runs-on: ubuntu-latest
+    on:
+      push:
+        tags:
+          - '*'
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
