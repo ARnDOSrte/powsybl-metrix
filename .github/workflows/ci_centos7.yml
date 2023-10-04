@@ -57,6 +57,7 @@ jobs:
       # - name: Tests
       #   run: cd $GITHUB_WORKSPACE/metrix-simulator/build-linux && ctest -j2 --output-on-failure
       - name: Prepare Metrix install
+        if: "contains(github.ref, 'tag')"
         id: metrix-install
         run: |
           ARCHIVE_NAME="metrix-simulator.zip"
@@ -66,6 +67,7 @@ jobs:
           echo "::set-output name=archive_path::$ARCHIVE_PATH"
 
       - name: Upload OR-Tools install artifact
+        if: "contains(github.ref, 'tag')"
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.metrix-install.outputs.archive_name }}
