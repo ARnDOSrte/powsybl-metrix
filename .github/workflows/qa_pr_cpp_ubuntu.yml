@@ -144,7 +144,7 @@ jobs:
   
   publish_asset:
     name: Publish release assets
-    needs: QA - full
+    needs: qa
     runs-on: ubuntu-latest
     if: github.event_name == 'release'
     steps:
