@@ -36,9 +36,9 @@ jobs:
         
       - name: Unzip Boost  
         run: |
-        pwd
-        ls
-        unzip boost_1_73_0.zip
+          pwd
+          ls
+          unzip boost_1_73_0.zip
         
       - name: Configure 3rd parties
         run: |
