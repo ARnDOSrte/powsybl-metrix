@@ -33,12 +33,12 @@ jobs:
           owner: ARnDOSrte
           repo: Boost
           token: ${{ secrets.TEST_TOKEN_RELEASE }}
-        run: |
-          pwd
-          ls
         
       - name: Unzip Boost  
-        run: unzip boost_1_73_0.zip
+        run: |
+        pwd
+        ls
+        unzip boost_1_73_0.zip
         
       - name: Configure 3rd parties
         run: |
