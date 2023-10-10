@@ -1,10 +1,10 @@
-name: QA-PR-CPP-UBUNTU
+name: QA-PR-CPP
 
 on:
   pull_request:
     types: [opened, synchronize, edited]
   release:
-    types: [created, published, released]
+    types: [created]
 
 jobs:
   clang-tidy:
@@ -54,7 +54,9 @@ jobs:
           java-version: 11
 
       - name: Install gcovr
-        run: sudo pip install gcovr
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y gcovr
 
       - name: Install Sonar wrapper
         working-directory: ${{ runner.workspace }}
@@ -114,24 +116,25 @@ jobs:
         run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 -R "bug_pne" --output-on-failure
 
       - name: Code coverage
+        if: github.event_name == 'release'
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --target code-coverage
 
-      # - name: Sonarcloud
-      #   working-directory: ${{ runner.workspace }}/powsybl-metrix/metrix-simulator
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #   run: >
-      #     ${{ runner.workspace }}/sonar/bin/sonar-scanner
-      #     -Dsonar.host.url=https://sonarcloud.io
-
-       - name: Prepare Metrix install
+      - name: Sonarcloud
+        working-directory: ${{ runner.workspace }}/powsybl-metrix/metrix-simulator
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          ${{ runner.workspace }}/sonar/bin/sonar-scanner
+          -Dsonar.host.url=https://sonarcloud.io
+      
+      - name: Prepare Metrix install
         if: github.event_name == 'release'
         id: metrix-install
         run: |
           ARCHIVE_NAME="metrix-simulator.zip"
           ARCHIVE_PATH="$PWD/${ARCHIVE_NAME}"
-          zip $ARCHIVE_PATH /__w/powsybl-metrix/powsybl-metrix/metrix-simulator/build-linux/install/bin/metrix-simulator
+          zip $ARCHIVE_PATH /__w/powsybl-metrix/powsybl-metrix/metrix-simulator/build/install/bin/metrix-simulator
           echo "::set-output name=archive_name::$ARCHIVE_NAME"
           echo "::set-output name=archive_path::$ARCHIVE_PATH"
 
@@ -154,16 +157,11 @@ jobs:
           name: metrix-simulator.zip
           path: ./
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.TEST_TOKEN_RELEASE }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
       
       - name: Upload Release Asset
         id: upload-release-asset 
@@ -171,7 +169,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TEST_TOKEN_RELEASE }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ steps.get_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
           asset_path: metrix-simulator.zip
           asset_name: metrix-simulator.zip
           asset_content_type: application/zip

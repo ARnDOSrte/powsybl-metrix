@@ -54,5 +54,5 @@ jobs:
       - name: Build
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build-linux --target install --parallel 2
 
-      # - name: Tests
-      #   run: cd $GITHUB_WORKSPACE/metrix-simulator/build-linux && ctest -j2 --output-on-failure  
+      - name: Tests
+        run: cd $GITHUB_WORKSPACE/metrix-simulator/build-linux && ctest -j2 --output-on-failure
