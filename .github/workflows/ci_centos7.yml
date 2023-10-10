@@ -28,10 +28,11 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Download Boost-release
-        uses: pozetroninc/github-action-get-latest-release@master
+        uses: dsaltares/fetch-gh-release-asset@master
         with:
-          owner: ARnDOSrte
-          repo: Boost
+          repo: 'ARnDOSrte/Boost'
+          file: 'boost_1_73_0.zip'
+          target: 'boost_1_73_0.zip'
           token: ${{ secrets.TEST_TOKEN_RELEASE }}
         
       - name: Unzip Boost  
