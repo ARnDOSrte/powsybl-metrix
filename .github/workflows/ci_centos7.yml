@@ -65,7 +65,7 @@ jobs:
           echo "On part deux crans en arrière"
           ls
           source /opt/rh/devtoolset-9/enable
-          cmake -S $GITHUB_WORKSPACE/metrix-simulator -Wno-dev -DCMAKE_BUILD_TYPE=Release -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0 -DBOOST_LIBRARYDIR=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build-linux/install -B $GITHUB_WORKSPACE/metrix-simulator/build-linux
+          cmake -S $GITHUB_WORKSPACE/metrix-simulator -Wno-dev -DCMAKE_BUILD_TYPE=Release -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0 -DBOOST_LIBRARYDIR=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0 -DBOOST_USE_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build-linux/install -B $GITHUB_WORKSPACE/metrix-simulator/build-linux
 
       - name: Build
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build-linux --target install --parallel 2
