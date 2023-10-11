@@ -52,8 +52,11 @@ jobs:
 
       - name: Configure CMake
         run: |
+          pwd
+          echo $GITHUB_WORKSPACE
+          ls
           source /opt/rh/devtoolset-9/enable
-          cmake -S $GITHUB_WORKSPACE/metrix-simulator -Wno-dev -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/_w/powsybl-metrix/powsybl-metrix/boost_1_73_0 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build-linux/install -B $GITHUB_WORKSPACE/metrix-simulator/build-linux
+          cmake -S $GITHUB_WORKSPACE/metrix-simulator -Wno-dev -DCMAKE_BUILD_TYPE=Release -DBoost_ROOT=/_w/powsybl-metrix/powsybl-metrix/boost_1_73_0 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build-linux/install -B $GITHUB_WORKSPACE/metrix-simulator/build-linux
 
       - name: Build
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build-linux --target install --parallel 2
