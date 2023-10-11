@@ -58,14 +58,14 @@ jobs:
           cd __w
           echo "on part dans __w"
           ls
-          cd Boost/Boost
-          echo "On part dans __w/Boost"
+          cd Boost/Boost/boost_1_73_0
+          echo "On part dans __w/Boost/Boost/boost_1_73_0"
           ls
-          cd ../../../
+          cd ../../../..
           echo "On part deux crans en arrière"
           ls
           source /opt/rh/devtoolset-9/enable
-          cmake -S $GITHUB_WORKSPACE/metrix-simulator -Wno-dev -DCMAKE_BUILD_TYPE=Release -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build-linux/install -B $GITHUB_WORKSPACE/metrix-simulator/build-linux
+          cmake -S $GITHUB_WORKSPACE/metrix-simulator -Wno-dev -DCMAKE_BUILD_TYPE=Release -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build-linux/install -B $GITHUB_WORKSPACE/metrix-simulator/build-linux
 
       - name: Build
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build-linux --target install --parallel 2
