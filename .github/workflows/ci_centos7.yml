@@ -55,7 +55,7 @@ jobs:
           pwd
           echo $GITHUB_WORKSPACE
           ls
-          cd .__w
+          cd __w
           echo "on part dans __w"
           ls
           cd ../..
