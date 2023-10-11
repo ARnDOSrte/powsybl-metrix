@@ -58,13 +58,12 @@ jobs:
           cd __w
           echo "on part dans __w"
           ls
-          cd Boost
+          cd Boost/Boost
           echo "On part dans __w/Boost"
           ls
-          cd ../..
+          cd ../../../
           echo "On part deux crans en arrière"
           ls
-          cd powsybl-metrix
           source /opt/rh/devtoolset-9/enable
           cmake -S $GITHUB_WORKSPACE/metrix-simulator -Wno-dev -DCMAKE_BUILD_TYPE=Release -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build-linux/install -B $GITHUB_WORKSPACE/metrix-simulator/build-linux
 
