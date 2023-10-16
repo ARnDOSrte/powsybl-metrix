@@ -76,6 +76,7 @@ jobs:
           yum install -y git redhat-lsb-core make wget centos-release-scl scl-utils
           yum install -y devtoolset-9
           yum install -y python-pip
+          pip install --upgrade pip
           yum install -y python-devel
           yum groupinstall -y 'development tools'
 
