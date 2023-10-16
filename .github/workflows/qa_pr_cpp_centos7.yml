@@ -116,7 +116,6 @@ jobs:
       - name: Configure 3rd parties
         run: |
           source /opt/rh/devtoolset-9/enable
-          source /opt/rh/devtoolset-9/enable
           cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build/external
 
       - name: Build 3rd parties
