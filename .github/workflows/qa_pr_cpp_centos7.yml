@@ -72,8 +72,8 @@ jobs:
           yum install -y epel-release
           yum install -y git redhat-lsb-core make wget centos-release-scl scl-utils
           yum install -y devtoolset-9
-          yum install -y python-pip
-          pip install --upgrade pip
+          # yum install -y python-pip
+          # pip install --upgrade pip
 
       - name: Install Java 11
         uses: actions/setup-java@v1
