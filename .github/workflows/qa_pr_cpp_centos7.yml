@@ -139,7 +139,8 @@ jobs:
       
       - name: Configure CMake (For Pull Request)
         if: github.event_name != 'release'
-        run: >
+        run: |
+          source /opt/rh/devtoolset-9/enable
           cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
           -DCMAKE_BUILD_TYPE=Debug
           -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost
@@ -147,7 +148,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
 
       - name: Build
-        run: >
+        run: |
           ${{ runner.workspace }}/build-wrapper-linux-x86/build-wrapper-linux-x86-64
           --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
           cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
