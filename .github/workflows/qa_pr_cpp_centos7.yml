@@ -130,8 +130,6 @@ jobs:
       - name: Configure CMake (For Release)
         if: github.event_name == 'release'
         run: |
-          pwd
-          ls
           source /opt/rh/devtoolset-9/enable
           cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
           -DCMAKE_BUILD_TYPE=Debug
@@ -142,6 +140,8 @@ jobs:
       - name: Configure CMake (For Pull Request)
         if: github.event_name != 'release'
         run: |
+          pwd
+          ls
           source /opt/rh/devtoolset-9/enable
           cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
           -DCMAKE_BUILD_TYPE=Debug
