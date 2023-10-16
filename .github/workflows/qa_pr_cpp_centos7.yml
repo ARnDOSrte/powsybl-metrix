@@ -34,8 +34,8 @@ jobs:
         run: |
           # yum install -y clang-tidy-14
           # yum update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-14 100
-          yum install centos-release-scl
-          yum install llvm-toolset-7.0
+          yum install -y centos-release-scl
+          yum install -y llvm-toolset-7.0
           scl enable llvm-toolset-7.0 bash
 
       - name: Checkout sources
@@ -75,10 +75,10 @@ jobs:
           yum install -y epel-release
           yum install -y git redhat-lsb-core make wget centos-release-scl scl-utils
           yum install -y devtoolset-9
-          yum install -y python-pip
-          pip install --upgrade pip
-          yum install -y python-devel
-          yum groupinstall -y 'development tools'
+          # yum install -y python-pip
+          # pip install --upgrade pip
+          # yum install -y python-devel
+          # yum groupinstall -y 'development tools'
 
         
       - name: Setup cmake
@@ -91,8 +91,8 @@ jobs:
         with:
           java-version: 11
 
-      - name: Install gcovr
-        run: pip install gcovr
+      # - name: Install gcovr
+      #   run: pip install gcovr
 
       - name: Install Sonar wrapper
         working-directory: ${{ runner.workspace }}
