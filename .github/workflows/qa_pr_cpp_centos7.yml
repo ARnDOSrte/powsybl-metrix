@@ -32,8 +32,11 @@ jobs:
 
       - name: Install clang-tidy
         run: |
-          yum install -y clang-tidy-14
-          yum update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-14 100
+          # yum install -y clang-tidy-14
+          # yum update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-14 100
+          sudo yum install centos-release-scl
+          sudo yum install llvm-toolset-7.0
+          scl enable llvm-toolset-7.0 bash
 
       - name: Checkout sources
         uses: actions/checkout@v1
@@ -72,8 +75,10 @@ jobs:
           yum install -y epel-release
           yum install -y git redhat-lsb-core make wget centos-release-scl scl-utils
           yum install -y devtoolset-9
-          # yum install -y python-pip
-          # pip install --upgrade pip
+          yum install -y python-pip
+          yum install python-devel
+          yum groupinstall 'development tools'
+
         
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v1.13
@@ -85,24 +90,24 @@ jobs:
         with:
           java-version: 11
 
-      # - name: Install gcovr
-      #   run: sudo pip install gcovr
+      - name: Install gcovr
+        run: pip install gcovr
 
-      # - name: Install Sonar wrapper
-      #   working-directory: ${{ runner.workspace }}
-      #   run: |
-      #     wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
-      #     unzip build-wrapper-linux-x86.zip
+      - name: Install Sonar wrapper
+        working-directory: ${{ runner.workspace }}
+        run: |
+          wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+          unzip build-wrapper-linux-x86.zip
 
-      # - name: Install Sonar scanner
-      #   working-directory: ${{ runner.workspace }}
-      #   run: |
-      #     wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
-      #     unzip sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
-      #     ln -s sonar-scanner-${SONAR_SCANNER_VERSION} sonar
-      #     rm sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
-        # env:
-        #   SONAR_SCANNER_VERSION: 3.3.0.1492
+      - name: Install Sonar scanner
+        working-directory: ${{ runner.workspace }}
+        run: |
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
+          unzip sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
+          ln -s sonar-scanner-${SONAR_SCANNER_VERSION} sonar
+          rm sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
+        env:
+          SONAR_SCANNER_VERSION: 3.3.0.1492
 
       - name: Checkout sources
         uses: actions/checkout@v1
@@ -140,23 +145,6 @@ jobs:
       - name: Configure CMake (For Pull Request)
         if: github.event_name != 'release'
         run: |
-          pwd
-          ls
-          cd __w
-          echo "on va dans __w"
-          ls
-          cd Boost
-          echo "on va dans Boost"
-          ls 
-          cd Boost
-          echo "on va dans Boost suivant"
-          ls
-          cd boost_1_73_0
-          echo "on va dans boost_1_73_0"
-          ls
-          cd installBoost
-          echo "on va dans installBoost"
-          ls
           source /opt/rh/devtoolset-9/enable
           cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build -DCMAKE_BUILD_TYPE=Debug -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DBoost_INCLUDE_DIR=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DCODE_COVERAGE=FALSE -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
 
@@ -169,17 +157,17 @@ jobs:
       - name: Tests
         run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 -R "bug_pne" --output-on-failure
 
-      # - name: Code coverage
-      #   run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --target code-coverage
+      - name: Code coverage
+        run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --target code-coverage
 
-      # - name: Sonarcloud
-      #   working-directory: ${{ runner.workspace }}/powsybl-metrix/metrix-simulator
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #   run: >
-      #     ${{ runner.workspace }}/sonar/bin/sonar-scanner
-      #     -Dsonar.host.url=https://sonarcloud.io
+      - name: Sonarcloud
+        working-directory: ${{ runner.workspace }}/powsybl-metrix/metrix-simulator
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          ${{ runner.workspace }}/sonar/bin/sonar-scanner
+          -Dsonar.host.url=https://sonarcloud.io
       
       - name: Prepare Metrix install
         if: github.event_name == 'release'
@@ -197,37 +185,3 @@ jobs:
         with:
           name: ${{ steps.metrix-install.outputs.archive_name }}
           path: ${{ steps.metrix-install.outputs.archive_path }}
-  
-  # publish_asset:
-  #   name: Publish release assets
-  #   needs: qa
-  #   runs-on: ubuntu-latest
-  #   if: github.event_name == 'release'
-  #   steps:
-  #     - name: Download artifacts
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: metrix-simulator.zip
-  #         path: ./
-
-  #     - name: Create Release
-  #       id: create_release
-  #       uses: actions/create-release@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.TEST_TOKEN_RELEASE }}
-  #       with:
-  #         tag_name: ${{ github.ref }}
-  #         release_name: Release ${{ github.ref }}
-  #         draft: false
-  #         prerelease: false
-      
-  #     - name: Upload Release Asset
-  #       id: upload-release-asset 
-  #       uses: actions/upload-release-asset@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.TEST_TOKEN_RELEASE }}
-  #       with:
-  #         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-  #         asset_path: metrix-simulator.zip
-  #         asset_name: metrix-simulator.zip
-  #         asset_content_type: application/zip
