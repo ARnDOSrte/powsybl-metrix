@@ -142,6 +142,21 @@ jobs:
         run: |
           pwd
           ls
+          cd __w
+          echo "on va dans __w"
+          ls
+          cd Boost
+          echo "on va dans Boost"
+          ls 
+          cd Boost
+          echo "on va dans Boost suivant"
+          ls
+          cd boost_1_73_0
+          echo "on va dans boost_1_73_0"
+          ls
+          cd installBoost
+          echo "on va dans installBoost"
+          ls
           source /opt/rh/devtoolset-9/enable
           cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
           -DCMAKE_BUILD_TYPE=Debug
