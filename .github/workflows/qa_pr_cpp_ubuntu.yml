@@ -10,7 +10,6 @@ jobs:
   clang-tidy:
     name: clang-tidy
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
     steps:
       - name: Install Boost
         run: |
