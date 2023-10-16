@@ -1,4 +1,4 @@
-name: QA-PR-CPP
+name: QA-PR-CPP-UBUNTU
 
 on:
   pull_request:
@@ -119,14 +119,14 @@ jobs:
         if: github.event_name == 'release'
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --target code-coverage
 
-      - name: Sonarcloud
-        working-directory: ${{ runner.workspace }}/powsybl-metrix/metrix-simulator
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: >
-          ${{ runner.workspace }}/sonar/bin/sonar-scanner
-          -Dsonar.host.url=https://sonarcloud.io
+      # - name: Sonarcloud
+      #   working-directory: ${{ runner.workspace }}/powsybl-metrix/metrix-simulator
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #   run: >
+      #     ${{ runner.workspace }}/sonar/bin/sonar-scanner
+      #     -Dsonar.host.url=https://sonarcloud.io
       
       - name: Prepare Metrix install
         if: github.event_name == 'release'

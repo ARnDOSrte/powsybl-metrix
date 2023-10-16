@@ -80,8 +80,8 @@ jobs:
         with:
           java-version: 11
 
-      - name: Install gcovr
-        run: sudo pip install gcovr
+      # - name: Install gcovr
+      #   run: sudo pip install gcovr
 
       # - name: Install Sonar wrapper
       #   working-directory: ${{ runner.workspace }}
@@ -96,8 +96,8 @@ jobs:
       #     unzip sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
       #     ln -s sonar-scanner-${SONAR_SCANNER_VERSION} sonar
       #     rm sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
-        env:
-          SONAR_SCANNER_VERSION: 3.3.0.1492
+        # env:
+        #   SONAR_SCANNER_VERSION: 3.3.0.1492
 
       - name: Download Boost-release
         uses: dsaltares/fetch-gh-release-asset@master
