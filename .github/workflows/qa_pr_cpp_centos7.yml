@@ -164,7 +164,7 @@ jobs:
         run: |
           echo ${{ runner.workspace }}
           ls
-          cmake --build $GITHUB_WORKSPACE/metrix-simulator/build-centos7 --target install --parallel 2
+          cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --target install --parallel 2
 
       - name: Tests
         run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 -R "bug_pne" --output-on-failure
