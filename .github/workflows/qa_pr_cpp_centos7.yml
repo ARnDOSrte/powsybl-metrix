@@ -52,7 +52,18 @@ jobs:
           cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build-linux/external
 
       - name: Build 3rd parties
-        run: >
+        run: |
+          pwd
+          ls
+          cd metrix-simulator
+          echo "on part dans metrix-simulator"
+          ls
+          cd build
+          echo "on part dans build"
+          ls
+          cd external
+          echo "on part dans external"
+          ls
           cmake --build $GITHUB_WORKSPACE/metrix-simulator/build/external --parallel 2
 
       - name: Configure CMake
