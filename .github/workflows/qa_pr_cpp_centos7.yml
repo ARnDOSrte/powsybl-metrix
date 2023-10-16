@@ -18,6 +18,14 @@ jobs:
           yum install -y epel-release
           yum install -y git redhat-lsb-core make wget centos-release-scl scl-utils
           yum install -y devtoolset-9
+        
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.13
+        with:
+          cmake-version: '3.22.x'
+      
+      - name: Checkout sources
+        uses: actions/checkout@v1
 
       - name: Download Boost-release
         uses: dsaltares/fetch-gh-release-asset@master
@@ -37,9 +45,6 @@ jobs:
           yum install -y centos-release-scl
           yum install -y llvm-toolset-7.0
           scl enable llvm-toolset-7.0 bash
-
-      - name: Checkout sources
-        uses: actions/checkout@v1
 
       - name: Configure 3rd parties
         run: |
