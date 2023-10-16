@@ -49,27 +49,16 @@ jobs:
       - name: Configure 3rd parties
         run: |
           source /opt/rh/devtoolset-9/enable
-          cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build-linux/external
+          cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build-centos7/external
 
       - name: Build 3rd parties
         run: |
-          pwd
-          ls
-          cd metrix-simulator
-          echo "on part dans metrix-simulator"
-          ls
-          cd build
-          echo "on part dans build"
-          ls
-          cd external
-          echo "on part dans external"
-          ls
-          cmake --build $GITHUB_WORKSPACE/metrix-simulator/build/external --parallel 2
+          cmake --build $GITHUB_WORKSPACE/metrix-simulator/build-centos7/external --parallel 2
 
       - name: Configure CMake
         run: |
           source /opt/rh/devtoolset-9/enable
-          cmake -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
+          cmake -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build-centos7
           -DCMAKE_BUILD_TYPE=Debug
           -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost
           -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -78,7 +67,7 @@ jobs:
         run: |
           export MODIFIED_FILES=$(git diff --name-only --diff-filter=d origin/${{ github.base_ref }} origin/${{ github.head_ref }}  | grep -E ".*(metrix-simulator/src|metrix-simulator/log).*\.(cpp|hpp)$")
           if [ -n "$MODIFIED_FILES" ]; then
-              clang-tidy $MODIFIED_FILES -p $GITHUB_WORKSPACE/metrix-simulator/build
+              clang-tidy $MODIFIED_FILES -p $GITHUB_WORKSPACE/metrix-simulator/build-centos7
           fi
   qa:
     name: QA - full
