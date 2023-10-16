@@ -58,10 +58,7 @@ jobs:
       - name: Configure CMake
         run: |
           source /opt/rh/devtoolset-9/enable
-          cmake -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build-centos7
-          -DCMAKE_BUILD_TYPE=Debug
-          -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost
-          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          cmake -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build-centos7 -DCMAKE_BUILD_TYPE=Debug -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Clang Tidy
         run: |
