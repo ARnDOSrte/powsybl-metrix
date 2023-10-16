@@ -97,7 +97,7 @@ jobs:
       #   run: pip install gcovr
 
       - name: Install gcovr
-        run: yum install -y gcovr
+        run: yum install -y gcov
 
       - name: Install Sonar wrapper
         working-directory: ${{ runner.workspace }}
