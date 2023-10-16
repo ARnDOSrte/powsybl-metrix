@@ -99,6 +99,9 @@ jobs:
         # env:
         #   SONAR_SCANNER_VERSION: 3.3.0.1492
 
+      - name: Checkout sources
+        uses: actions/checkout@v1
+      
       - name: Download Boost-release
         uses: dsaltares/fetch-gh-release-asset@master
         with:
@@ -109,9 +112,6 @@ jobs:
         
       - name: Unzip Boost  
         run: unzip boost_1_73_0.zip
-
-      - name: Checkout sources
-        uses: actions/checkout@v1
 
       - name: Configure 3rd parties
         run: |
