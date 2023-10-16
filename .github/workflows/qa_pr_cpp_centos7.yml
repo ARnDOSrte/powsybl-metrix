@@ -164,9 +164,7 @@ jobs:
         run: |
           echo ${{ runner.workspace }}
           ls
-          ${{ runner.workspace }}/build-wrapper-linux-x86/build-wrapper-linux-x86-64
-          --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
-          cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
+          cmake --build $GITHUB_WORKSPACE/metrix-simulator/build-centos7 --target install --parallel 2
 
       - name: Tests
         run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 -R "bug_pne" --output-on-failure
