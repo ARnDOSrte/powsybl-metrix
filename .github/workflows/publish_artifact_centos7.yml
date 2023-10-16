@@ -1,4 +1,4 @@
-name: CI-cpp-centos7
+name: publish_centos7
 
 on:
   workflow_dispatch:
