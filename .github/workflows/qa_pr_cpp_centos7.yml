@@ -109,13 +109,17 @@ jobs:
           wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip build-wrapper-linux-x86.zip
           ls
+          echo a1
+          echo b1
           cd build-wrapper-linux-x86
           echo "On part dans build-wrapper-linux-x86"
           ls
-          # cd build-wrapper-linux-x86-64
-          # echo "on part dans build-wrapper-linux-x86/build-wrapper-linux-x86-64"
-          # ls
-          cd ..
+          echo a2
+          echo b2
+          cd build-wrapper-linux-x86-64
+          echo "on part dans build-wrapper-linux-x86/build-wrapper-linux-x86-64"
+          ls
+          cd ../..
 
       - name: Install Sonar scanner
         working-directory: ${{ runner.workspace }}
