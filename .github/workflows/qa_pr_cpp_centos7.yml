@@ -173,7 +173,7 @@ jobs:
         run: |
           pwd
           ls
-          powsybl-metrix/powsybl-metrix/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
+          build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
           
       - name: Build
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
