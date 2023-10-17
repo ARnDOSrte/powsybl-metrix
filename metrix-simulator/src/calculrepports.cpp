@@ -132,7 +132,7 @@ int Calculer::calculCoefsReport(std::shared_ptr<Incident> icdt)
                 icdt->validite_ = false;
                 return METRIX_PAS_PROBLEME;
             }
-// TEST
+
             for (auto& quad : res_.quadsSurv_) {
                 int ii = quad->tnnorqua();
                 int jj = quad->tnnexqua();

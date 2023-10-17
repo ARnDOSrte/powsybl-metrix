@@ -191,4 +191,3 @@ int Calculer::empilementEconomiqueDesGroupes(const std::shared_ptr<Variante>& va
     }
     return METRIX_PAS_PROBLEME;
 }
-// TEST
