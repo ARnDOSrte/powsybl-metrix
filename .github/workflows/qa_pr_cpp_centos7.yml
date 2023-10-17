@@ -175,6 +175,7 @@ jobs:
           ls
           cd
           pwd
+          ls
           cd ${{ runner.workspace }}
           echo "on va dans ${{ runner.workspace }}"
           ls
