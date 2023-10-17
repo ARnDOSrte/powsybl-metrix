@@ -115,7 +115,7 @@ jobs:
           # cd build-wrapper-linux-x86-64
           # echo "on part dans build-wrapper-linux-x86/build-wrapper-linux-x86-64"
           # ls
-          cd..
+          cd ..
 
       - name: Install Sonar scanner
         working-directory: ${{ runner.workspace }}

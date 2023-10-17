@@ -1,6 +1,6 @@
 name: CI-cpp-ubuntu
 
-on: [push]
+on: [release]
 
 defaults:
   run:

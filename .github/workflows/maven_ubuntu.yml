@@ -1,6 +1,6 @@
 name: CI_ubuntu
 
-on: [push]
+on: [release]
 
 jobs:
   build:
