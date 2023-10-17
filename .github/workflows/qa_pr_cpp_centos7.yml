@@ -168,24 +168,13 @@ jobs:
           source /opt/rh/devtoolset-9/enable
           cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build -DCMAKE_BUILD_TYPE=Debug -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DBoost_INCLUDE_DIR=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DCODE_COVERAGE=TRUE -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
 
+      - name: Build-Sonar
+        working-directory: ${{ runner.workspace }}
+        run: ${{ runner.workspace }}/powsybl-metrix/powsybl-metrix/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
+          
       - name: Build
-        run: |
-          echo ${{ runner.workspace }}
-          pwd
-          ls
-          cd
-          pwd
-          ls
-          cd ${{ runner.workspace }}
-          echo "on va dans ${{ runner.workspace }}"
-          ls
-          cd build-wrapper-linux-x86
-          echo "on va dans build-wrapper-linux-x86"
-          ls
-          cd
-          cd $GITHUB_WORKSPACE
-          __w/powsybl-metrix/powsybl-metrix/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
-          cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
+        run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
+      
       - name: Tests
         run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 --output-on-failure
 
