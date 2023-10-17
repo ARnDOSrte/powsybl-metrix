@@ -171,7 +171,8 @@ jobs:
       - name: Build
         run: |
           echo ${{ runner.workspace }}
-          /__w/powsybl-metrix/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
+          pwd
+          /home/runner/work/powsybl-metrix/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
           cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
       - name: Tests
         run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 --output-on-failure
