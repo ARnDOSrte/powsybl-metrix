@@ -911,6 +911,7 @@ void Calculer::printFctObj(bool silent)
         }
     }
 
+
     consoTotale_ = sumProdApresEmpilement;
 
     fonction_objectif_C_ += fonction_objectif_G_cur_ + fonction_objectif_D_cur_;
