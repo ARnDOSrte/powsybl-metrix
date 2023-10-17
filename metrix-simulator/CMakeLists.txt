@@ -194,6 +194,3 @@ write_basic_package_version_file(
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/metrix-simulator-config.cmake"
     DESTINATION ${INSTALL_CMAKE_DIR}
 )
-message("On affiche la version du compilo")
-message(CMAKE_CXX_COMPILER_ID)
-message(CMAKE_CXX_COMPILER_VERSION)

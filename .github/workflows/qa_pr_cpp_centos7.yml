@@ -105,8 +105,17 @@ jobs:
       - name: Install Sonar wrapper
         working-directory: ${{ runner.workspace }}
         run: |
+        pwd
           wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip build-wrapper-linux-x86.zip
+          ls
+          cd build-wrapper-linux-x86
+          echo "On part dans build-wrapper-linux-x86"
+          ls
+          cd build-wrapper-linux-x86
+          echo "on part dans build-wrapper-linux-x86/build-wrapper-linux-x86"
+          ls
+          cd../..
 
       - name: Install Sonar scanner
         working-directory: ${{ runner.workspace }}
