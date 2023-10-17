@@ -4024,7 +4024,6 @@ int Calculer::ajoutContraintes(bool& existe_contrainte_active,
     return METRIX_PAS_PROBLEME;
 }
 
-
 int Calculer::ajoutContrainte(const std::shared_ptr<Contrainte>& ctre, const std::vector<double>& secondMembreFixe)
 {
     if ((ctre->ctrSup_ && ctre->maxT_ == config::constants::valdef)

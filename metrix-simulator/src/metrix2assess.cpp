@@ -1629,7 +1629,6 @@ bool Calculer::computeCosts(const std::vector<int>& constraintsToDelail,
                                      << typeEtat_[numVar];
                 }
 
-
             } else if (typeOu[j] == 4) { // curatif
                 if (typeEtat_[numVar] == GRP_CUR_H || typeEtat_[numVar] == GRP_CUR_B || typeEtat_[numVar] == CONSO_B
                     || typeEtat_[numVar] == CONSO_H || typeEtat_[numVar] == DEPH_CUR_B

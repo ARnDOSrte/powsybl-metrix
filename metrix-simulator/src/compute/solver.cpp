@@ -16,7 +16,6 @@ namespace compute
 {
 void Solver::solve(PROBLEME_A_RESOUDRE* pne_problem) { PNE_Solveur(pne_problem); }
 
-
 void Solver::solve(PROBLEME_SIMPLEXE* spx_problem)
 {
     if (problem_ != nullptr) {

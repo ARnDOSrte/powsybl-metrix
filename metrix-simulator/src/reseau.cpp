@@ -3031,7 +3031,6 @@ void Reseau::updateVariant(MapQuadinVar& mapping, const config::VariantConfigura
         }
     }
 
-
     for (const auto& group : config.randomGroups) {
         auto groupesIt = groupes_.find(group);
         if (groupesIt != groupes_.end()) {

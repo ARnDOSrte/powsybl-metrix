@@ -14,7 +14,6 @@
 
 #include <algorithm>
 
-
 MarginVariationMatrix::MarginVariationMatrix(int nbConstraints,
                                              int nbComplementaryVar,
                                              int nbVars,

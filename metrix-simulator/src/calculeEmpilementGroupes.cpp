@@ -177,7 +177,6 @@ int Calculer::empilementEconomiqueDesGroupes(const std::shared_ptr<Variante>& va
         LOG_ALL(info) << err::ioDico().msg("INFOSPXPenalisationTDHVDC");
     }
 
-
     // utilisation de PneSolveur
     int status = METRIX_PAS_PROBLEME;
     status = PneSolveur(UTILISATION_SIMPLEXE, varianteCourante);
