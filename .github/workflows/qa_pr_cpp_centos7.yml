@@ -105,6 +105,7 @@ jobs:
       - name: Install Sonar wrapper
         working-directory: ${{ runner.workspace }}
         run: |
+          echo ${{ runner.workspace }}
           pwd
           wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip build-wrapper-linux-x86.zip
@@ -116,10 +117,7 @@ jobs:
           ls
           echo a2
           echo b2
-          cd build-wrapper-linux-x86-64
-          echo "on part dans build-wrapper-linux-x86/build-wrapper-linux-x86-64"
-          ls
-          cd ../..
+          cd ..
 
       - name: Install Sonar scanner
         working-directory: ${{ runner.workspace }}
@@ -172,7 +170,8 @@ jobs:
 
       - name: Build
         run: |
-          ${{ runner.workspace }}/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
+          echo ${{ runner.workspace }}
+          /__w/powsybl-metrix/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
           cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
       - name: Tests
         run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 --output-on-failure
