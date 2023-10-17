@@ -173,16 +173,16 @@ jobs:
           echo ${{ runner.workspace }}
           pwd
           ls
-          cd __w
-          echo "on va dans __w"
+          cd
+          pwd
+          cd ${{ runner.workspace }}
+          echo "on va dans ${{ runner.workspace }}"
           ls
-          cd powsybl-metrix
-          echo "on va dans powsybl-metrix"
+          cd build-wrapper-linux-x86
+          echo "on va dans build-wrapper-linux-x86"
           ls
-          cd powsybl-metrix
-          echo "on va dans powsybl-metrix"
-          ls
-          cd ../../..
+          cd
+          cd $GITHUB_WORKSPACE
           __w/powsybl-metrix/powsybl-metrix/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
           cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
       - name: Tests
