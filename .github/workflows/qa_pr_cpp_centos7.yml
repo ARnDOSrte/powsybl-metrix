@@ -109,11 +109,11 @@ jobs:
           wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip build-wrapper-linux-x86.zip
           ls
-          cd build-wrapper-linux-x86-64
+          cd build-wrapper-linux-x86
           echo "On part dans build-wrapper-linux-x86"
           ls
           cd build-wrapper-linux-x86-64
-          echo "on part dans build-wrapper-linux-x86/build-wrapper-linux-x86"
+          echo "on part dans build-wrapper-linux-x86/build-wrapper-linux-x86-64"
           ls
           cd../..
 
@@ -168,7 +168,7 @@ jobs:
 
       - name: Build
         run: |
-          ${{ runner.workspace }}/build-wrapper-linux-x86-64/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
+          ${{ runner.workspace }}/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
           cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
       - name: Tests
         run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 --output-on-failure
