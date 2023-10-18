@@ -14,6 +14,9 @@ jobs:
     steps:
       - name: Install Dependancies
         run: |
+          echo $GITHUB_WORKSPACE
+          pwd
+          echo ${{ runner.workspace }}
           yum update -y
           yum install -y epel-release
           yum install -y git redhat-lsb-core make wget centos-release-scl scl-utils
@@ -185,7 +188,7 @@ jobs:
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --target code-coverage
 
       - name: Sonarcloud
-        working-directory: ${{ runner.workspace }}
+        working-directory: ${{ runner.workspace }}/powsybl-metrix/metrix-simulator
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

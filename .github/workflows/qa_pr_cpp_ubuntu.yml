@@ -1,8 +1,8 @@
 name: QA-PR-CPP-UBUNTU
 
 on:
-  # pull_request:
-  #   types: [opened, synchronize, edited]
+  pull_request:
+    types: [opened, synchronize, edited]
   release:
     types: [created, edited]
 
@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Install Boost
         run: |
+          echo $GITHUB_WORKSPACE
+          pwd
+          echo ${{ runner.workspace }}
           sudo apt-get update -y
           sudo apt-get install -y libboost-all-dev
 
