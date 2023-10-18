@@ -106,7 +106,7 @@ jobs:
 
 
       - name: Install Sonar wrapper
-        working-directory: /home/runner/work/powsybl-metrix
+        working-directory: /__w/powsybl-metrix
         run: |
           echo ${{ runner.workspace }}
           pwd
@@ -123,7 +123,7 @@ jobs:
           cd ..
 
       - name: Install Sonar scanner
-        working-directory: /home/runner/work/powsybl-metrix
+        working-directory: /__w/powsybl-metrix
         run: |
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
           unzip sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
@@ -175,7 +175,7 @@ jobs:
         run: |
           pwd
           ls
-          /home/runner/work/powsybl-metrix/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
+          /__w/powsybl-metrix/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
           
       # - name: Build
       #   run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
