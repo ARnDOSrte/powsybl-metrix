@@ -106,7 +106,7 @@ jobs:
 
 
       - name: Install Sonar wrapper
-        working-directory: ${{ runner.workspace }}
+        # working-directory: ${{ runner.workspace }}
         run: |
           echo ${{ runner.workspace }}
           pwd
@@ -123,7 +123,7 @@ jobs:
           cd ..
 
       - name: Install Sonar scanner
-        working-directory: ${{ runner.workspace }}
+        # working-directory: ${{ runner.workspace }}
         run: |
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
           unzip sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
@@ -172,7 +172,7 @@ jobs:
           cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build -DCMAKE_BUILD_TYPE=Debug -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DBoost_INCLUDE_DIR=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DCODE_COVERAGE=TRUE -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
 
       - name: Build-Sonar
-        working-directory: ${{ runner.workspace }}
+        # working-directory: ${{ runner.workspace }}
         run: |
           pwd
           ls
@@ -188,12 +188,12 @@ jobs:
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --target code-coverage
 
       - name: Sonarcloud
-        working-directory: ${{ runner.workspace }}/powsybl-metrix/metrix-simulator
+        working-directory: $GITHUB_WORKSPACE/metrix-simulator
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          sonar/bin/sonar-scanner -Dsonar.host.url=https://sonarcloud.io
+          $GITHUB_WORKSPACE/sonar/bin/sonar-scanner -Dsonar.host.url=https://sonarcloud.io
       
       - name: Prepare Metrix install
         if: github.event_name == 'release'
