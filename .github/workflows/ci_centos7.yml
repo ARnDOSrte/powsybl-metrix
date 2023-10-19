@@ -2,7 +2,7 @@ name: CI-cpp-centos7
 
 on:
   workflow_dispatch: {}
-  # push: {}
+  push: {}
 
 defaults:
   run:

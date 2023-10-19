@@ -2,7 +2,7 @@ name: QA-PR-CPP-CENTOS7
 
 on:
   pull_request:
-    types: [opened, synchronize, edited]
+    types: [opened, ready-for-review]
   release:
     types: [created, published, released]
 
@@ -94,9 +94,6 @@ jobs:
         with:
           java-version: 11
 
-      # - name: Install gcovr
-      #   run: pip install gcovr
-
       - name: Install gcovr
         run: |
           yum -y install libxml2-devel libxslt-devel 
@@ -108,19 +105,8 @@ jobs:
       - name: Install Sonar wrapper
         working-directory: /__w/powsybl-metrix
         run: |
-          echo ${{ runner.workspace }}
-          pwd
           wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip build-wrapper-linux-x86.zip
-          ls
-          echo a1
-          echo b1
-          cd build-wrapper-linux-x86
-          echo "On part dans build-wrapper-linux-x86"
-          ls
-          echo a2
-          echo b2
-          cd ..
 
       - name: Install Sonar scanner
         working-directory: /__w/powsybl-metrix
@@ -154,36 +140,16 @@ jobs:
       - name: Build 3rd parties
         run: |
           cmake --build $GITHUB_WORKSPACE/metrix-simulator/build/external --parallel 2
-
-      - name: Configure CMake (For Release)
-        if: github.event_name == 'release'
-        run: |
-          source /opt/rh/devtoolset-9/enable
-          cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
-          -DCMAKE_BUILD_TYPE=Debug
-          -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost
-          -DCODE_COVERAGE=TRUE
-          -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
       
-      - name: Configure CMake (For Pull Request)
-        if: github.event_name != 'release'
+      - name: Configure CMake
         run: |
           source /opt/rh/devtoolset-9/enable
           cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build -DCMAKE_BUILD_TYPE=Debug -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DBoost_INCLUDE_DIR=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DCODE_COVERAGE=TRUE -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
 
-      - name: Build-Sonar
+      - name: Build
         run: |
-          cd ..
-          ls
-          echo "on retourne dans le dossier initial"
-          cd powsybl-metrix
-          pwd
-          ls
           /__w/powsybl-metrix/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
           
-      # - name: Build
-      #   run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
-      
       - name: Tests
         run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 --output-on-failure
 
@@ -191,16 +157,11 @@ jobs:
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --target code-coverage
 
       - name: Sonarcloud
-        # working-directory: $GITHUB_WORKSPACE/metrix-simulator
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          pwd
           cd metrix-simulator
-          echo "on va dans metrix-simulator"
-          echo "on affiche le dossier"
-          ls
           /__w/powsybl-metrix/sonar/bin/sonar-scanner -Dsonar.host.url=https://sonarcloud.io
       
       - name: Prepare Metrix install

@@ -2,9 +2,9 @@ name: QA-PR-CPP-UBUNTU
 
 on:
   pull_request:
-    types: [opened, synchronize, edited]
+    types: [opened, ready-for-review]
   release:
-    types: [created, edited]
+    types: [created, published, released]
 
 jobs:
   clang-tidy:
@@ -13,9 +13,6 @@ jobs:
     steps:
       - name: Install Boost
         run: |
-          echo $GITHUB_WORKSPACE
-          pwd
-          echo ${{ runner.workspace }}
           sudo apt-get update -y
           sudo apt-get install -y libboost-all-dev
 
@@ -93,17 +90,8 @@ jobs:
       - name: Build 3rd parties
         run: >
           cmake --build $GITHUB_WORKSPACE/metrix-simulator/build/external --parallel 2
-
-      - name: Configure CMake (For Release)
-        if: github.event_name == 'release'
-        run: >
-          cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
-          -DCMAKE_BUILD_TYPE=Debug
-          -DCODE_COVERAGE=TRUE
-          -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
       
-      - name: Configure CMake (For Pull Request)
-        if: github.event_name != 'release'
+      - name: Configure CMake
         run: >
           cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
           -DCMAKE_BUILD_TYPE=Debug
