@@ -1,6 +1,12 @@
 name: CI_centos7
 
-on: [release]
+on:
+  push:
+    branches:
+      - 'main'
+      - 'release-v**'
+      - 'full-sonar-analysis-**'
+  pull_request:
 
 jobs:
   build:
