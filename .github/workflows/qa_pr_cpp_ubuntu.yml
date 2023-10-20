@@ -2,7 +2,7 @@ name: QA-PR-CPP-UBUNTU
 
 on:
   pull_request:
-    types: [opened, ready-for-review]
+    types: [opened, synchronize, ready-for-review, review_requested]
   release:
     types: [created, published, released]
 
