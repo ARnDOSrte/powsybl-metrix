@@ -2,7 +2,9 @@ name: CI-cpp-centos7
 
 on:
   workflow_dispatch: {}
-  push: {}
+  pull_request:
+  push:
+  release:
 
 defaults:
   run:

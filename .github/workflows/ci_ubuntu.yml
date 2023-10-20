@@ -2,7 +2,9 @@ name: CI-cpp-ubuntu
 
 on: 
   workflow_dispatch: {}
-  push: {}
+  pull_request:
+  push:
+  release:
 
 defaults:
   run:
