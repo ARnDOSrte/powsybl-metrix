@@ -47,7 +47,7 @@ jobs:
     name: QA - CI
     runs-on: ubuntu-latest
     # if: (github.event_name == 'pull_request' && (github.event.action == 'ready_for_review' || github.event.action == 'opened')) || github.event_name == 'release'
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.action == 'ready_for_review'
     steps:
       - name: Install Java 11
         uses: actions/setup-java@v1
