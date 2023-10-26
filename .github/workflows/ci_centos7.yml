@@ -69,15 +69,7 @@ jobs:
           ARCHIVE_NAME="metrix-simulator-centos7.zip"
           ARCHIVE_PATH="$PWD/${ARCHIVE_NAME}"
           cd metrix-simulator/build-centos7/install/
-          ls
-          cd bin
-          ls
-          cd ..
-          cd etc
-          ls
-          cd ..
           zip -r $ARCHIVE_PATH bin etc
-          cd ../../..
           echo "::set-output name=archive_name::$ARCHIVE_NAME"
           echo "::set-output name=archive_path::$ARCHIVE_PATH"
 
