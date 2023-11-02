@@ -2,7 +2,7 @@ name: QA-PR-CPP-CENTOS7
 
 on:
   pull_request:
-    types: [opened, synchronize, edited]
+    types: [opened, ready_for_review]
   release:
     types: [created, published, released]
 
@@ -14,50 +14,61 @@ jobs:
     steps:
       - name: Install Dependancies
         run: |
+          echo $GITHUB_WORKSPACE
+          pwd
+          echo ${{ runner.workspace }}
           yum update -y
           yum install -y epel-release
           yum install -y git redhat-lsb-core make wget centos-release-scl scl-utils
           yum install -y devtoolset-9
+        
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.13
+        with:
+          cmake-version: '3.22.x'
+      
+      - name: Checkout sources
+        uses: actions/checkout@v1
 
-      - name: Install Boost
-        run: |
-          source /opt/rh/devtoolset-9/enable
-          wget https://boostorg.jfrog.io/artifactory/main/release/1.73.0/source/boost_1_73_0.tar.gz
-          tar -xzvf ./boost_1_73_0.tar.gz
-          cd boost_1_73_0
-          ./bootstrap.sh --prefix=/usr/local
-          ./b2 install --without-python -j 5
-          cd ..
+      - name: Download Boost-release
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'ARnDOSrte/Boost'
+          file: 'boost_1_73_0.zip'
+          target: 'boost_1_73_0.zip'
+          token: ${{ secrets.TEST_TOKEN_RELEASE }}
+        
+      - name: Unzip Boost  
+        run: unzip boost_1_73_0.zip
 
       - name: Install clang-tidy
         run: |
-          yum install -y clang-tidy-14
-          yum update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-14 100
-
-      - name: Checkout sources
-        uses: actions/checkout@v1
+          # yum install -y clang-tidy-14
+          # yum update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-14 100
+          yum install -y centos-release-scl
+          yum install -y llvm-toolset-7.0
+          scl enable llvm-toolset-7.0 bash
 
       - name: Configure 3rd parties
         run: |
           source /opt/rh/devtoolset-9/enable
-          cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build-linux/external
+          cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build-centos7/external
 
       - name: Build 3rd parties
-        run: >
-          cmake --build $GITHUB_WORKSPACE/metrix-simulator/build/external --parallel 2
+        run: |
+          cmake --build $GITHUB_WORKSPACE/metrix-simulator/build-centos7/external --parallel 2
 
       - name: Configure CMake
         run: |
           source /opt/rh/devtoolset-9/enable
-          cmake -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
-          -DCMAKE_BUILD_TYPE=Debug
-          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          cmake -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build-centos7 -DCMAKE_BUILD_TYPE=Debug -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Clang Tidy
         run: |
           export MODIFIED_FILES=$(git diff --name-only --diff-filter=d origin/${{ github.base_ref }} origin/${{ github.head_ref }}  | grep -E ".*(metrix-simulator/src|metrix-simulator/log).*\.(cpp|hpp)$")
+          echo $MODIFIED_FILES
           if [ -n "$MODIFIED_FILES" ]; then
-              clang-tidy $MODIFIED_FILES -p $GITHUB_WORKSPACE/metrix-simulator/build
+              clang-tidy $MODIFIED_FILES -p $GITHUB_WORKSPACE/metrix-simulator/build-centos7
           fi
   qa:
     name: QA - full
@@ -70,6 +81,13 @@ jobs:
           yum install -y epel-release
           yum install -y git redhat-lsb-core make wget centos-release-scl scl-utils
           yum install -y devtoolset-9
+          yum install -y python3 python3-pip
+
+        
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.13
+        with:
+          cmake-version: '3.22.x'
 
       - name: Install Java 11
         uses: actions/setup-java@v1
@@ -77,16 +95,21 @@ jobs:
           java-version: 11
 
       - name: Install gcovr
-        run: yum pip install gcovr
+        run: |
+          yum -y install libxml2-devel libxslt-devel 
+          yum -y clean all
+          pip3 install wheel
+          pip3 install gcovr cpplint
+
 
       - name: Install Sonar wrapper
-        working-directory: ${{ runner.workspace }}
+        working-directory: /__w/powsybl-metrix
         run: |
           wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip build-wrapper-linux-x86.zip
 
       - name: Install Sonar scanner
-        working-directory: ${{ runner.workspace }}
+        working-directory: /__w/powsybl-metrix
         run: |
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
           unzip sonar-scanner-cli-${SONAR_SCANNER_VERSION}.zip
@@ -95,74 +118,60 @@ jobs:
         env:
           SONAR_SCANNER_VERSION: 3.3.0.1492
 
-      - name: Install Boost
-        run: |
-          source /opt/rh/devtoolset-9/enable
-          wget https://boostorg.jfrog.io/artifactory/main/release/1.73.0/source/boost_1_73_0.tar.gz
-          tar -xzvf ./boost_1_73_0.tar.gz
-          cd boost_1_73_0
-          ./bootstrap.sh --prefix=/usr/local
-          ./b2 install --without-python -j 5
-          cd ..
-
       - name: Checkout sources
         uses: actions/checkout@v1
+      
+      - name: Download Boost-release
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'ARnDOSrte/Boost'
+          file: 'boost_1_73_0.zip'
+          target: 'boost_1_73_0.zip'
+          token: ${{ secrets.TEST_TOKEN_RELEASE }}
+        
+      - name: Unzip Boost  
+        run: unzip boost_1_73_0.zip
 
       - name: Configure 3rd parties
         run: |
-          source /opt/rh/devtoolset-9/enable
           source /opt/rh/devtoolset-9/enable
           cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build/external
 
       - name: Build 3rd parties
         run: |
           cmake --build $GITHUB_WORKSPACE/metrix-simulator/build/external --parallel 2
-
-      - name: Configure CMake (For Release)
-        if: github.event_name == 'release'
+      
+      - name: Configure CMake
         run: |
           source /opt/rh/devtoolset-9/enable
-          cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
-          -DCMAKE_BUILD_TYPE=Debug
-          -DCODE_COVERAGE=TRUE
-          -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
-      
-      - name: Configure CMake (For Pull Request)
-        if: github.event_name != 'release'
-        run: >
-          cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
-          -DCMAKE_BUILD_TYPE=Debug
-          -DCODE_COVERAGE=FALSE
-          -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
+          cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build -DCMAKE_BUILD_TYPE=Debug -DBoost_ROOT=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DBoost_INCLUDE_DIR=$GITHUB_WORKSPACE/__w/Boost/Boost/boost_1_73_0/installBoost -DCODE_COVERAGE=TRUE -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
 
       - name: Build
-        run: >
-          ${{ runner.workspace }}/build-wrapper-linux-x86/build-wrapper-linux-x86-64
-          --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output
-          cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
-
+        run: |
+          /__w/powsybl-metrix/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir $GITHUB_WORKSPACE/metrix-simulator/build/output cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
+          
       - name: Tests
-        run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 -R "bug_pne" --output-on-failure
+        run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 --output-on-failure
 
       - name: Code coverage
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --target code-coverage
 
-      # - name: Sonarcloud
-      #   working-directory: ${{ runner.workspace }}/powsybl-metrix/metrix-simulator
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #   run: >
-      #     ${{ runner.workspace }}/sonar/bin/sonar-scanner
-      #     -Dsonar.host.url=https://sonarcloud.io
+      - name: Sonarcloud
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          cd metrix-simulator
+          /__w/powsybl-metrix/sonar/bin/sonar-scanner -Dsonar.host.url=https://sonarcloud.io
       
       - name: Prepare Metrix install
         if: github.event_name == 'release'
         id: metrix-install
         run: |
-          ARCHIVE_NAME="metrix-simulator.zip"
+          ARCHIVE_NAME="metrix-simulator-centos7.zip"
           ARCHIVE_PATH="$PWD/${ARCHIVE_NAME}"
-          zip $ARCHIVE_PATH /__w/powsybl-metrix/powsybl-metrix/metrix-simulator/build-linux/install/bin/metrix-simulator
+          cd metrix-simulator/build/install/
+          zip -r $ARCHIVE_PATH bin etc
           echo "::set-output name=archive_name::$ARCHIVE_NAME"
           echo "::set-output name=archive_path::$ARCHIVE_PATH"
 
@@ -172,37 +181,3 @@ jobs:
         with:
           name: ${{ steps.metrix-install.outputs.archive_name }}
           path: ${{ steps.metrix-install.outputs.archive_path }}
-  
-  publish_asset:
-    name: Publish release assets
-    needs: qa
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release'
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: metrix-simulator.zip
-          path: ./
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TEST_TOKEN_RELEASE }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-      
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TEST_TOKEN_RELEASE }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: metrix-simulator.zip
-          asset_name: metrix-simulator.zip
-          asset_content_type: application/zip

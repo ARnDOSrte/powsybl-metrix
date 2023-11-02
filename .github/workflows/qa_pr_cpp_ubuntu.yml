@@ -1,10 +1,10 @@
-name: QA-PR-CPP
+name: QA-PR-CPP-UBUNTU
 
 on:
   pull_request:
-    types: [opened, synchronize, edited]
+    types: [opened, ready_for_review]
   release:
-    types: [created]
+    types: [created, published, released]
 
 jobs:
   clang-tidy:
@@ -41,6 +41,7 @@ jobs:
       - name: Clang Tidy
         run: |
           export MODIFIED_FILES=$(git diff --name-only --diff-filter=d origin/${{ github.base_ref }} origin/${{ github.head_ref }}  | grep -E ".*(metrix-simulator/src|metrix-simulator/log).*\.(cpp|hpp)$")
+          echo $MODIFIED_FILES
           if [ -n "$MODIFIED_FILES" ]; then
               clang-tidy $MODIFIED_FILES -p $GITHUB_WORKSPACE/metrix-simulator/build
           fi
@@ -48,10 +49,10 @@ jobs:
     name: QA - full
     runs-on: ubuntu-latest
     steps:
-      - name: Install Java 11
+      - name: Install Java 17
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 17
 
       - name: Install gcovr
         run: |
@@ -89,21 +90,12 @@ jobs:
       - name: Build 3rd parties
         run: >
           cmake --build $GITHUB_WORKSPACE/metrix-simulator/build/external --parallel 2
-
-      - name: Configure CMake (For Release)
-        if: github.event_name == 'release'
+      
+      - name: Configure CMake
         run: >
           cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
           -DCMAKE_BUILD_TYPE=Debug
           -DCODE_COVERAGE=TRUE
-          -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
-      
-      - name: Configure CMake (For Pull Request)
-        if: github.event_name != 'release'
-        run: >
-          cmake -Wno-dev -S $GITHUB_WORKSPACE/metrix-simulator -B $GITHUB_WORKSPACE/metrix-simulator/build
-          -DCMAKE_BUILD_TYPE=Debug
-          -DCODE_COVERAGE=FALSE
           -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/metrix-simulator/build/install
 
       - name: Build
@@ -113,10 +105,9 @@ jobs:
           cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --parallel 2 --target install
 
       - name: Tests
-        run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 -R "bug_pne" --output-on-failure
+        run: cd $GITHUB_WORKSPACE/metrix-simulator/build && ctest -j8 --output-on-failure
 
       - name: Code coverage
-        if: github.event_name == 'release'
         run: cmake --build $GITHUB_WORKSPACE/metrix-simulator/build --target code-coverage
 
       - name: Sonarcloud
@@ -132,9 +123,10 @@ jobs:
         if: github.event_name == 'release'
         id: metrix-install
         run: |
-          ARCHIVE_NAME="metrix-simulator.zip"
+          ARCHIVE_NAME="metrix-simulator-ubuntu.zip"
           ARCHIVE_PATH="$PWD/${ARCHIVE_NAME}"
-          zip $ARCHIVE_PATH /__w/powsybl-metrix/powsybl-metrix/metrix-simulator/build/install/bin/metrix-simulator
+          cd metrix-simulator/build/install/
+          zip -r $ARCHIVE_PATH bin etc
           echo "::set-output name=archive_name::$ARCHIVE_NAME"
           echo "::set-output name=archive_path::$ARCHIVE_PATH"
 
@@ -144,32 +136,3 @@ jobs:
         with:
           name: ${{ steps.metrix-install.outputs.archive_name }}
           path: ${{ steps.metrix-install.outputs.archive_path }}
-  
-  publish_asset:
-    name: Publish release assets
-    needs: qa
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release'
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: metrix-simulator.zip
-          path: ./
-
-      - name: Get release
-        id: get_release
-        uses: bruceadams/get-release@v1.3.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.TEST_TOKEN_RELEASE }}
-      
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TEST_TOKEN_RELEASE }}
-        with:
-          upload_url: ${{ steps.get_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: metrix-simulator.zip
-          asset_name: metrix-simulator.zip
-          asset_content_type: application/zip
