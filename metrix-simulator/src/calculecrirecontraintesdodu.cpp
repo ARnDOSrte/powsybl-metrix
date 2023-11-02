@@ -2865,6 +2865,7 @@ int Calculer::coeffPourQuadEnN(const std::shared_ptr<Quadripole>& quad,
     int nbVarPrev = res_.nbVarGroupes_ + res_.nbVarConsos_ + res_.nbVarTd_ + res_.nbVarCc_;
     for (int j = 0; j < nbVarPrev; ++j) {
         numSupportDeEtat = numSupportEtat_[j];
+        
 
         if (typeEtat_[j] == PROD_H) {
             coefs_[j] += coeff * b1[numSupportDeEtat];
