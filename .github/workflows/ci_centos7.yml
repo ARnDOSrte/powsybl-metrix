@@ -45,7 +45,7 @@ jobs:
       
       - name : Install Python Xpress
         run: |
-          pip install xpress
+          python3-pip install xpress
           ls /home/runner/.local/lib/python3.10/site-packages/xpress/lib
           cd /home/runner/.local/lib/python3.10/site-packages/xpress/lib
           ln -s libxprs.so* libxprs.so
