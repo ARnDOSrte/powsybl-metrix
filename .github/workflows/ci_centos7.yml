@@ -46,32 +46,7 @@ jobs:
       - name : Install Python Xpress
         run: |
           pip3 install xpress
-          echo "Quel est le répertoire courant : "
-          pwd
-          echo "On recule d'un répertoire et on regarde le contenu"
-          cd ..
-          ls
-          echo "On recule de deux répertoires et on regarde le contenu"
-          cd ..
-          ls
-          echo "On recule d'un répertoire et on regarde le contenu"
-          cd ..
-          ls
-          echo "on cherche xpress"
-          find . -type d -name "xpress"
-          echo "on part dans lib/python3.6/site-packages"
-          cd lib/python3.6/site-packages
-          ls
-          echo "On part dans lib64/python3.6"
-          cd ../../../
-          cd lib64/python3.6
-          ls
-          echo "On part dans lib64/python3.6/site-packages"
-          cd site-packages
-          ls
-          ls /home/runner/.local/lib/python3.10/site-packages/xpress
-          ls /home/runner/.local/lib/python3.10/site-packages/xpress/lib
-          cd /home/runner/.local/lib/python3.10/site-packages/xpress/lib
+          cd /home/usr/local/lib64/python3.6/site-packages/xpress/lib
           ln -s libxprs.so* libxprs.so
 
       - name: Setup xpress env
