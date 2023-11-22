@@ -46,8 +46,13 @@ jobs:
       - name : Install Python Xpress
         run: |
           pip3 install xpress
+          echo "Quel est le répertoire courant : "
           pwd
+          echo "On recule de deux répertoires et on regarde le contenu"
           cd ../..
+          ls
+          echo "On recule d'un répertoire et on regarde le contenu"
+          cd ..
           ls
           ls /home/runner/.local/lib/python3.10/site-packages/xpress
           ls /home/runner/.local/lib/python3.10/site-packages/xpress/lib
