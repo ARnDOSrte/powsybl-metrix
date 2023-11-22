@@ -18,8 +18,6 @@ jobs:
     steps:
       - name: Install Dependencies
         run: |
-          pwd
-          ls
           yum update -y
           yum install -y epel-release
           yum install -y git redhat-lsb-core make wget centos-release-scl scl-utils
@@ -48,21 +46,9 @@ jobs:
       - name : Install Python Xpress
         run: |
           pip3 install xpress
-          echo "On checke le répertoire courant"
+          pwd
+          cd ../..
           ls
-          echo "On checke le contenu de __w"
-          ls w__
-          echo "on checke le contenu de runner"
-          ls /home/runner
-          echo "on checke le contenu de .local"
-          ls /home/runner/.local
-          echo "on checke le contenu de lib"
-          ls /home/runner/.local/lib
-          echo "on checke le contenu de python3.10"
-          ls /home/runner/.local/lib/python3.10
-          echo "on checke le contenu de site-packages"
-          ls /home/runner/.local/lib/python3.10/site-packages
-          echo "on checke le contenu de xpress"
           ls /home/runner/.local/lib/python3.10/site-packages/xpress
           ls /home/runner/.local/lib/python3.10/site-packages/xpress/lib
           cd /home/runner/.local/lib/python3.10/site-packages/xpress/lib
