@@ -46,6 +46,18 @@ jobs:
       - name : Install Python Xpress
         run: |
           pip3 install xpress
+          echo "on checke le contenu de runner"
+          ls /home/runner
+          echo "on checke le contenu de .local"
+          ls /home/runner/.local
+          echo "on checke le contenu de lib"
+          ls /home/runner/.local/lib
+          echo "on checke le contenu de python3.10"
+          ls /home/runner/.local/lib/python3.10
+          echo "on checke le contenu de site-packages"
+          ls /home/runner/.local/lib/python3.10/site-packages
+          echo "on checke le contenu de xpress"
+          ls /home/runner/.local/lib/python3.10/site-packages/xpress
           ls /home/runner/.local/lib/python3.10/site-packages/xpress/lib
           cd /home/runner/.local/lib/python3.10/site-packages/xpress/lib
           ln -s libxprs.so* libxprs.so
