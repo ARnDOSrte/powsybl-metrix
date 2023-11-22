@@ -51,7 +51,7 @@ jobs:
           cd 
           pwd
           ls
-          cd /github/home/usr/local/lib64/python3.6/site-packages/xpress/lib
+          cd ./usr/local/lib64/python3.6/site-packages/xpress/lib
           ln -s libxprs.so* libxprs.so
 
       - name: Setup xpress env
