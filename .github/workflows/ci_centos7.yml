@@ -46,7 +46,9 @@ jobs:
       - name : Install Python Xpress
         run: |
           pip3 install xpress
-          cd ../../..
+          echo ${{runner.workspace}}
+          cd /./usr/local/lib64/python3.6/site-packages/xpress
+          cd 
           pwd
           cd ./usr/local/lib64/python3.6/site-packages/xpress/lib
           ln -s libxprs.so* libxprs.so
@@ -58,6 +60,11 @@ jobs:
           echo "XPRESS=/home/runner/.local/lib/python3.10/site-packages/xpress/license/community-xpauth.xpr" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=/home/runner/.local/lib/python3.10/site-packages/xpress/lib" >> $GITHUB_ENV
 
+      - name: Configure 3rd parties
+        run: |
+          source /opt/rh/devtoolset-9/enable
+          cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build-centos7/external -DCMAKE_BUILD_TYPE=Release \ -DUSE_XPRESS=${{ matrix.xprs }} \
+      
       - name: Configure 3rd parties
         working-directory: metrix-simulator
         run: |
@@ -75,6 +82,7 @@ jobs:
       - name: Configure CMake
         working-directory: metrix-simulator
         run: |
+          source /opt/rh/devtoolset-9/enable
           cmake -S . \
                 -B build-linux \
                 -DCMAKE_BUILD_TYPE=Release \
