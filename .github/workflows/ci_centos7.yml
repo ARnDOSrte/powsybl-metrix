@@ -57,12 +57,12 @@ jobs:
           echo "On recule d'un répertoire et on regarde le contenu"
           cd ..
           ls
-          echo "on part dans lib"
-          cd lib
+          echo "on part dans lib/python3.6"
+          cd lib/python3.6
           ls
-          echo "On part dans lib64"
+          echo "On part dans lib64/python3.6"
           cd ..
-          cd lib64
+          cd lib64/python3.6
           ls
           ls /home/runner/.local/lib/python3.10/site-packages/xpress
           ls /home/runner/.local/lib/python3.10/site-packages/xpress/lib
