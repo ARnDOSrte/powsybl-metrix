@@ -48,6 +48,8 @@ jobs:
           pip3 install xpress
           echo "On checke le répertoire courant"
           ls
+          echo "On checke le contenu de __w"
+          ls w__
           echo "on checke le contenu de runner"
           ls /home/runner
           echo "on checke le contenu de .local"
