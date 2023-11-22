@@ -46,6 +46,8 @@ jobs:
       - name : Install Python Xpress
         run: |
           pip3 install xpress
+          echo "On checke le répertoire courant"
+          ls
           echo "on checke le contenu de runner"
           ls /home/runner
           echo "on checke le contenu de .local"
