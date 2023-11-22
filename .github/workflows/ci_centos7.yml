@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Install Dependencies
         run: |
-        ls ./__w
+          ls ./__w
           yum update -y
           yum install -y epel-release
           yum install -y git redhat-lsb-core make wget centos-release-scl scl-utils
