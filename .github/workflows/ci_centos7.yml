@@ -46,7 +46,9 @@ jobs:
       - name : Install Python Xpress
         run: |
           pip3 install xpress
-          cd /home/usr/local/lib64/python3.6/site-packages/xpress/lib
+          cd ../../..
+          pwd
+          cd ./usr/local/lib64/python3.6/site-packages/xpress/lib
           ln -s libxprs.so* libxprs.so
 
       - name: Setup xpress env
