@@ -48,8 +48,11 @@ jobs:
           pip3 install xpress
           echo "Quel est le répertoire courant : "
           pwd
+          echo "On recule d'un répertoire et on regarde le contenu"
+          cd ..
+          ls
           echo "On recule de deux répertoires et on regarde le contenu"
-          cd ../..
+          cd ..
           ls
           echo "On recule d'un répertoire et on regarde le contenu"
           cd ..
