@@ -57,6 +57,8 @@ jobs:
           echo "On recule d'un répertoire et on regarde le contenu"
           cd ..
           ls
+          echo "on cherche xpress"
+          find . -type d -name "xpress"
           echo "on part dans lib/python3.6/site-packages"
           cd lib/python3.6/site-packages
           ls
