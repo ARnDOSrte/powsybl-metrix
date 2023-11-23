@@ -51,7 +51,7 @@ jobs:
           cd 
           pwd
           ls
-          cd ./usr/local/lib64/python3.6/site-packages/xpress/lib
+          cd //usr/local/lib64/python3.6/site-packages/xpress/lib
           ln -s libxprs.so* libxprs.so
 
       - name: Setup xpress env
@@ -64,17 +64,7 @@ jobs:
       - name: Configure 3rd parties
         run: |
           source /opt/rh/devtoolset-9/enable
-          cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build-centos7/external -DCMAKE_BUILD_TYPE=Release \ -DUSE_XPRESS=${{ matrix.xprs }} \
-      
-      - name: Configure 3rd parties
-        working-directory: metrix-simulator
-        run: |
-          source /opt/rh/devtoolset-9/enable
-          cmake -S external \
-                -B build-linux/external \
-                -DCMAKE_BUILD_TYPE=Release \
-                -DUSE_XPRESS=${{ matrix.xprs }} \
-                -DXPRESS_ROOT="${{ env.XPRESSDIR }}"
+          cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build-centos7/external -DCMAKE_BUILD_TYPE=Release -DUSE_XPRESS=${{ matrix.xprs }} -DXPRESS_ROOT="${{ env.XPRESSDIR }}"
 
       - name: Build 3rd parties
         working-directory: metrix-simulator
