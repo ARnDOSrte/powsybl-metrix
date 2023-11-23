@@ -75,7 +75,7 @@ jobs:
         run: |
           source /opt/rh/devtoolset-9/enable
           cmake -S . \
-                -B build-linux \
+                -B build-centos7 \
                 -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_INSTALL_PREFIX=build-centos7/install \
                 -DINSTALL_CMAKE_DIR=. \
