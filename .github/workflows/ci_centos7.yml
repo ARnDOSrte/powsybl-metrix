@@ -57,9 +57,9 @@ jobs:
       - name: Setup xpress env
         if: ${{ matrix.xprs == 'ON' }}
         run: |
-          echo "XPRESSDIR=/home/runner/.local/lib/python3.10/site-packages/xpress" >> $GITHUB_ENV
-          echo "XPRESS=/home/runner/.local/lib/python3.10/site-packages/xpress/license/community-xpauth.xpr" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=/home/runner/.local/lib/python3.10/site-packages/xpress/lib" >> $GITHUB_ENV
+          echo "XPRESSDIR=//usr/local/lib64/python3.6/site-packages/xpress" >> $GITHUB_ENV
+          echo "XPRESS=//usr/local/lib64/python3.6/site-packages/xpress/license/community-xpauth.xpr" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=//usr/local/lib64/python3.6/site-packages/xpress/lib" >> $GITHUB_ENV
 
       - name: Configure 3rd parties
         run: |
@@ -68,7 +68,7 @@ jobs:
 
       - name: Build 3rd parties
         working-directory: metrix-simulator
-        run: cmake --build build-linux/external --parallel 2
+        run: cmake --build build-centos7/external --parallel 2
 
       - name: Configure CMake
         working-directory: metrix-simulator
@@ -77,7 +77,7 @@ jobs:
           cmake -S . \
                 -B build-linux \
                 -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_INSTALL_PREFIX=build-linux/install \
+                -DCMAKE_INSTALL_PREFIX=build-centos7/install \
                 -DINSTALL_CMAKE_DIR=. \
                 -DUSE_ORTOOLS=ON \
                 -DUSE_XPRESS=${{ matrix.xprs }} \
@@ -85,18 +85,18 @@ jobs:
 
       - name: Build
         working-directory: metrix-simulator
-        run: cmake --build build-linux --target install --parallel 2
+        run: cmake --build build-centos7 --target install --parallel 2
 
       - name: Tests
-        working-directory: metrix-simulator/build-linux
+        working-directory: metrix-simulator/build-centos7
         run: ctest -j8 --output-on-failure
 
       - name: Prepare metrix install
         id: metrix-install
-        working-directory: metrix-simulator/build-linux
+        working-directory: metrix-simulator/build-centos7
         run: |
           [ ${{ matrix.xprs }} == "ON" ] && ARCHIVE_NAME=metrix_xprs || ARCHIVE_NAME=metrix
-          ARCHIVE_PATH="${{ github.workspace }}/metrix-simulator/build-linux/install"
+          ARCHIVE_PATH="${{ github.workspace }}/metrix-simulator/build-centos7/install"
           echo "::set-output name=archive_name::$ARCHIVE_NAME"
           echo "::set-output name=archive_path::$ARCHIVE_PATH"
 
