@@ -60,7 +60,7 @@ jobs:
                 -DCMAKE_INSTALL_PREFIX=build-linux/install \
                 -DINSTALL_CMAKE_DIR=. \
                 -DUSE_ORTOOLS=ON \
-                -DUSE_CENTOS7=OFF
+                -DUSE_CENTOS7=OFF \
                 -DUSE_XPRESS=${{ matrix.xprs }} \
                 -DXPRESS_ROOT="${{ env.XPRESSDIR }}"
 
