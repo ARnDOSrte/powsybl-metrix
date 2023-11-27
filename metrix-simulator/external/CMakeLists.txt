@@ -97,6 +97,7 @@ endif()
 set(ortools_url https://github.com/rte-france/or-tools)
 set(ortools_tag v9.5-rte2.0)
 
+option(USE_XPRESS "Use XPRESS in ortools" OFF)
 option(USE_CENTOS7 "Use centos7 " OFF)
 if (USE_CENTOS7)
   set(ortools_asset "ortools_cxx_centos7_shared_sirius.zip")
