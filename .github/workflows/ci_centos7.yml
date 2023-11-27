@@ -64,7 +64,7 @@ jobs:
       - name: Configure 3rd parties
         run: |
           source /opt/rh/devtoolset-9/enable
-          cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build-centos7/external -DCMAKE_BUILD_TYPE=Release -DUSE_XPRESS=${{ matrix.xprs }} -DXPRESS_ROOT="${{ env.XPRESSDIR }}"
+          cmake -S $GITHUB_WORKSPACE/metrix-simulator/external -B $GITHUB_WORKSPACE/metrix-simulator/build-centos7/external -DCMAKE_BUILD_TYPE=Release -DUSE_CENTOS7=ON -DUSE_XPRESS=${{ matrix.xprs }} -DXPRESS_ROOT="${{ env.XPRESSDIR }}"
 
       - name: Build 3rd parties
         working-directory: metrix-simulator
@@ -81,6 +81,7 @@ jobs:
                 -DCMAKE_INSTALL_PREFIX=build-centos7/install \
                 -DINSTALL_CMAKE_DIR=. \
                 -DUSE_ORTOOLS=ON \
+                -DUSE_CENTOS7=ON \
                 -DUSE_XPRESS=${{ matrix.xprs }} \
                 -DXPRESS_ROOT="${{ env.XPRESSDIR }}"
 

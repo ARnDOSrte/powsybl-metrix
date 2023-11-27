@@ -43,6 +43,7 @@ jobs:
           cmake -S external \
                 -B build-linux/external \
                 -DCMAKE_BUILD_TYPE=Release \
+                -DUSE_CENTOS7=OFF \
                 -DUSE_XPRESS=${{ matrix.xprs }} \
                 -DXPRESS_ROOT="${{ env.XPRESSDIR }}"
 
@@ -59,6 +60,7 @@ jobs:
                 -DCMAKE_INSTALL_PREFIX=build-linux/install \
                 -DINSTALL_CMAKE_DIR=. \
                 -DUSE_ORTOOLS=ON \
+                -DUSE_CENTOS7=OFF
                 -DUSE_XPRESS=${{ matrix.xprs }} \
                 -DXPRESS_ROOT="${{ env.XPRESSDIR }}"
 
