@@ -38,6 +38,8 @@ class ElementASurveiller;
 class PochePerdue;
 class ElementCuratifHVDC;
 class ElementCuratifTD;
+class ElementCuratifGroupe;
+class ElementCuratifConso;
 
 
 enum ModeCuratif { PREVENTIF_SEUL = 0, CURATIF_POSSIBLE = 1 };
@@ -67,7 +69,9 @@ public:
                                      // vaut 0 si la parade est active; 1 sinon
     int positionVarEntiereCur_ = -1; // pointe dans la place dans le vect. variable, la variable entiere qui active ou
                                      // desactive l'action
-
+    bool usedElCur_ = false; //true if the element is used in this variant (FOR DETERMINISM PURPOSE with the Tests)
+    double coutHausse_ = -config::constants::valdef; //Cost used only for determinism purposes in the Tests.
+    double coutBaisse_ = -config::constants::valdef; //Cost used only for determinism purposes in the Tests.
     void reset();
     virtual bool estValide() = 0;
     virtual int numVarPrev() = 0;
@@ -294,6 +298,9 @@ public:
     double seuilMax(const std::shared_ptr<Incident>& icdt) const;
     double seuilMin(const std::shared_ptr<Incident>& icdt) const;
     double seuil(const std::shared_ptr<Incident>& icdt, double transit) const;
+    std::string nomSeuil(const std::shared_ptr<Incident>& icdt, double transit) const;
+    std::string nomSeuilMax(const std::shared_ptr<Incident>& icdt) const;
+    std::string nomSeuilMin(const std::shared_ptr<Incident>& icdt) const;
 };
 
 //----------------
@@ -339,6 +346,11 @@ public:
     double coutBaisseHR_ = 0.0; /* cout Hors reseau*/
     double coutHausseAR_ = 0.0; /* cout Avec reseau*/
     double coutBaisseAR_ = 0.0; /* cout Avec reseau*/
+
+    double coutHausseHRBase_ = 0.0; /* cout de base Hors reseau (POUR LES TESTS SEULEMENT)*/
+    double coutBaisseHRBase_ = 0.0; /* cout de base Hors reseau (POUR LES TESTS SEULEMENT)*/
+    double coutHausseARBase_ = 0.0; /* cout de base Avec reseau (POUR LES TESTS SEULEMENT)*/
+    double coutBaisseARBase_ = 0.0; /* cout de base Avec reseau (POUR LES TESTS SEULEMENT)*/
 
     double participation_ = 0.0; /* Participation du grp au reglage de frequence*/
     int numVarGrp_ = -1;         /* numero de la variable correspondant au groupe (numVarGrp_, numVarGrp_+1)*/
@@ -408,6 +420,7 @@ public:
 
     double seuil_ = 0.0; /* pourcentage max de delestage preventif % */
     double cout_ = 0.0;  /* cout du delestage preventif */
+    double coutAR_ = 0.0; /*Cout du delestage en préventif en phase avec réseau*/
 
     std::set<int> incidentsAtraiterCuratif_;                // indices des incidents a traiter en curatif
     double coutEffacement_ = config::constants::valdef;     /* Cout de l'effacement curatif dans la variante */
@@ -458,6 +471,7 @@ public:
     std::set<int> incidentsAtraiterCuratif_; // indices des incidents a traiter en curatif
     int numVar_ = -1;                        // numero de la position de sa consigne en N dans le vecteur variable
     int numVarEntiere_ = -1;                 // numero de la variable entiere d'activation (td fictif)
+    double coutTD_ = 0.0;                    /* coût des TDs (Seulement pour les TNRs)*/
 
     TransformateurDephaseur(int unsigned num,
                             const std::shared_ptr<Quadripole>& quadTd,
@@ -530,6 +544,8 @@ public:
 
     // donnees variables d'une variante a l'autre
     std::vector<double> rho_; // coefficient de report pour le changement de consigne de la HVDC
+
+    double coutLigneCC_ = 0.0; /* coût des LCCs (Seulement pour les TNRs)*/
 
     bool isEmulationAC() const;
 
@@ -841,6 +857,12 @@ public:
         lccElemCur_; // pour rechercher les hvdc curatifs sur l'incident
     std::map<std::shared_ptr<Quadripole>, std::shared_ptr<ElementCuratifTD>>
         tdFictifsElemCur_; // pour rechercher les td fictif de l'incident
+    std::map<std::string, std::shared_ptr<ElementCuratifGroupe>>
+        grpNameElemCur_; // pour rechercher les groupes de l'incident
+    std::map<std::string, std::shared_ptr<ElementCuratifConso>>
+        consoNameElemCur_; // pour rechercher les consommations de l'incident
+    std::map<std::string, std::shared_ptr<ElementCuratifTD>>
+        tdNameElemCur_; // pour rechercher les TD de l'incident d'après le nom de TD->quadVrai_
 
     // Donnees pour les fermetures de couplages (uniquement pour une parade) :
     int nbCouplagesFermes_ = 0;

@@ -113,6 +113,8 @@ ERRGroupeIntrouvable						Production unit '$1' in law $2 cannot be found
 ERRTDPriseIntrouvable						For PST '$1' required tap $2 cannot be found for variant $3 
 ERRNoeudConsoIntrouvable					Node '$1' in load variation law number $2 cannot be found 
 ERRIncidentIntrouvable                      Outage id '$1' in variation law $2 for variant $3 cannot be found
+ERRTDIntrouvable                            The td '$1' cannot be found in variant '$2'
+ERRElemCurIntrouvable                       CurativeElement '$1' of incident '$2' in variant $3 cannot be found
 ERRQuadIntrouvable							Line '$1' in law $2:$3 cannot be found 
 ERRConsoIntrouvable							Load id '$1' in variation law $2 for variant $3 cannot be found
 ERRTypeLoiInconnu							Law type $1 is unknown

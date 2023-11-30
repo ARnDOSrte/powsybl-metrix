@@ -111,11 +111,13 @@ ERRPremiereVarIntrouvable					Le numéro de la première variante est introuvabl
 ERRFormatNombre                             Format de nombre incorrect : '$2' pour la loi $1
 ERRRegionIntrouvable						La région '$1' de la loi $2 est introuvable
 ERRGroupeIntrouvable						Le groupe '$1' de la loi $2 est introuvable
-ERRTDPriseIntrouvable						Pour le td '$1' la prise souhaitée $2 est introuvable pour la variante $3
+ERRTDPriseIntrouvable						Pour le td '$1' la prise souhaitée $2 est introuvable pour la variante '$3'
+ERRTDIntrouvable                            Le td '$1' est introuvable pour la variante '$2'
 ERRNoeudConsoIntrouvable					Le noeud '$1' de la loi $2 de variation de conso est introuvable
 ERRQuadIntrouvable							La ligne '$1' de la loi $2:$3 est introuvable
 ERRConsoIntrouvable							La consommation '$1' de la loi $2 pour la variante $3 est introuvable
 ERRIncidentIntrouvable                      L'incident '$1' de la loi $2 pour la variante $3 est introuvable
+ERRElemCurIntrouvable                       L'élément curatif '$1' de l'incident '$2' en variante $3 est introuvable
 ERRTypeLoiInconnu							Le type de loi $1 est inconnu
 ERRPasDeconsoSurNoeud						Il n'y a pas de conso sur le noeud $1
 ERRApplLoiBilanGrpNonImp					Erreur sur l'application de la variante de bilan, le groupe $1 n etant pas impose

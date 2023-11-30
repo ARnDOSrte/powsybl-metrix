@@ -182,6 +182,7 @@ public:
     bool displayResultatsSurcharges() const { return resultats_surcharges_; }
     bool showAllAngleTDTransitHVDC() const { return showAllAngleTDTransitHVDC_; }
     bool showLostLoadDetailed() const { return show_lost_load_detailed_; }
+    bool displayRAZGroupes() const { return raz_groupes; }
 
     float costTd() const { return cost_td_; }
     float costHvdc() const { return cost_hvdc_; }
@@ -211,6 +212,7 @@ public:
 
     // complex getter
     double thresholdMaxITAM(double thresholdMaxInc, double thresholdMaxBeforeCur) const;
+    std::tuple<std::string, double> nameThresholdMaxITAM(double thresholdMaxInc, std::string nameThresholdMaxInc, double thresholdMaxBeforeCur, std::string nameThresholdMaxBeforeCur) const;
 
 private:
     static std::string pathname_;
@@ -351,6 +353,7 @@ private:
     bool resultats_surcharges_;      // sortie uniquement des résultats sur les flux correspondants à une surcharge
     bool showAllAngleTDTransitHVDC_; // Display in all cases the angle for TDs and HVDCs even if they were not modified
     bool show_lost_load_detailed_;
+    bool raz_groupes; //After every variant, put all production costs back to their original value (FOR TESTS ONLY)
 
     float cost_td_;                               // cost of TD actions
     float cost_hvdc_;                             // cost of HVDC action

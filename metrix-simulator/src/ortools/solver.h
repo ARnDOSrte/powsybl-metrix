@@ -98,6 +98,9 @@ private:
         }
 
         auto params = makeParams<PROBLEM>(*problem);
+        // params->SetDoubleParam(operations_research::MPSolverParameters::DoubleParam::PRIMAL_TOLERANCE, 1e-5);
+        // params->SetDoubleParam(operations_research::MPSolverParameters::DoubleParam::DUAL_TOLERANCE, 1e-5);
+        // params->SetDoubleParam(operations_research::MPSolverParameters::DoubleParam::RELATIVE_MIP_GAP, 1e-7);
         auto status = solver_->Solve(*params);
 
         if (status == operations_research::MPSolver::ResultStatus::OPTIMAL

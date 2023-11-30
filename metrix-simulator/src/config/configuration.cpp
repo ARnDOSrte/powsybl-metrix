@@ -314,6 +314,7 @@ void Configuration::initWithRawConfig(const raw_configuration& raw_config)
     resultats_surcharges_ = helper::updateValueNumber(std::get<BOOLEAN>(raw_config), "OVRLDRES", false);
     showAllAngleTDTransitHVDC_ = helper::updateValueNumber(std::get<BOOLEAN>(raw_config), "SHTDHVDC", false);
     show_lost_load_detailed_ = helper::updateValueNumber(std::get<BOOLEAN>(raw_config), "LOSTLOAD", false);
+    raz_groupes = helper::updateValueNumber(std::get<BOOLEAN>(raw_config), "RAZGROUP", false);
 
     cost_td_ = helper::updateValueNumber(std::get<FLOAT>(raw_config), "TDPENALI", 1.e-2F);
     cost_hvdc_ = helper::updateValueNumber(std::get<FLOAT>(raw_config), "HVDCPENA", 0.1F);
@@ -375,6 +376,19 @@ double Configuration::thresholdMaxITAM(double thresholdMaxInc, double thresholdM
 
     // This implies that in case both equal valdef, we return valdef
     return thresholdMaxBeforeCur;
+}
+
+std::tuple<std::string, double> Configuration::nameThresholdMaxITAM(double thresholdMaxInc, std::string nameThresholdMaxInc, double thresholdMaxBeforeCur, std::string nameThresholdMaxBeforeCur) const
+{
+    std::tuple<std::string, double> thresholdAndName;
+    if (!test_seuil_itam_ || thresholdMaxInc != constants::valdef) {
+        thresholdAndName = make_tuple(nameThresholdMaxInc, thresholdMaxInc);
+        
+    }else{
+        // This implies that in case both equal valdef, we return valdef
+        thresholdAndName = make_tuple(nameThresholdMaxBeforeCur, thresholdMaxBeforeCur);
+    }
+    return thresholdAndName;
 }
 
 } // namespace config

@@ -274,6 +274,7 @@ public:
     int getClosestTapPosition(TransformateurDephaseur* td, double angleFinal);
     bool calculVariationsMarginales(FILE* fr, const std::map<std::shared_ptr<Incident>, int>& incidentsContraignants);
     static double round(double x, double prec); // utiliser pour arrondir les calculs
+    static double cutDecimals(double x); //utilisé quand le round ne suffit pas, pour R3 et R3B
     Calculer(Reseau& res, MapQuadinVar& variantesOrdonnees);
     int PneSolveur(TypeDeSolveur typeSolveur, const std::shared_ptr<Variante>& varianteCourante);
     void comput_ParticipationGrp(const std::shared_ptr<Incident>& icdt) const;
@@ -450,10 +451,10 @@ private:
     void assessAndPrintPTDF(const string& PTDFfileName);
     void printLODF(const string& LODFfileName, bool writeLODFfile) const;
 
-    void addCurativeVariable(const std::shared_ptr<TransformateurDephaseur>& td, double proba, int numVarCur);
-    void addCurativeVariable(const std::shared_ptr<TransformateurDephaseur>& td_fictive);
-    void addCurativeVariable(const std::shared_ptr<LigneCC>& lcc, double proba, int numVarCur);
-    void addCurativeVariable(const std::shared_ptr<Groupe>& grp, double proba, int numVarCur);
+    void addCurativeVariable(const std::shared_ptr<ElementCuratifTD>& elemCurTD, double proba, int numVarCur);
+    void addCurativeVariable(const std::shared_ptr<ElementCuratifTD>& elemCurTDFictif, double proba);
+    void addCurativeVariable(const std::shared_ptr<ElementCuratifHVDC>& elemCurHVDC, double proba, int numVarCur);
+    void addCurativeVariable(const std::shared_ptr<ElementCuratifGroupe>& elemCurGrp, double proba, int numVarCur);
     void addCurativeVariable(const std::shared_ptr<Consommation>& conso, double proba, int numVarCur);
 
 private:

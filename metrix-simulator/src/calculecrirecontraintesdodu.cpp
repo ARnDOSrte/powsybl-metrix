@@ -42,7 +42,8 @@ using std::setw;
 using std::string;
 
 const double COEFF_MULT = 1e-3;
-
+static const string PREC_FLOAT_BIS = "%.4f";
+static const string PREC_FLOAT_TER = "%.15f";
 // Pour reduire la precision des coefficients utilises dans les calculs
 double Calculer::round(double x, double prec)
 {
@@ -239,25 +240,77 @@ int Calculer::ecrireContraintesDeBordGroupesDodu()
                     LOG_ALL(error) << err::ioDico().msg("ERRPminSupPc", grp->nom_);
                     return METRIX_PROBLEME;
                 }
+            //     // P_min<=P_0
+            //     if (grp->puisMin_ <= grp->prodPobj_) {
+            //         // A la hausse
+            //         pbXmin_[numVar] = 0.0;
+            //         pbXmax_[numVar] = grp->puisMax_ - grp->prodPobj_;
+            //         pbCoutLineaire_[numVar] = std::max(grp->coutHausseHR_, config::configuration().noiseCost())
+            //                                   + config::configuration().adequacyCostOffset();
+            //         // A la baisse
+            //         pbXmin_[numVar + 1] = 0.0;
+            //         pbXmax_[numVar + 1] = grp->prodPobj_ - grp->puisMin_;
+            //         pbCoutLineaire_[numVar + 1] = std::max(grp->coutBaisseHR_, config::configuration().noiseCost())
+            //                                       + config::configuration().adequacyCostOffset();
+
+            //     } else { // P_min>P_0
+            //         // A la hausse
+            //         pbXmin_[numVar] = grp->puisMin_ - grp->prodPobj_;
+            //         pbXmax_[numVar] = grp->puisMax_ - grp->prodPobj_;
+            //         pbCoutLineaire_[numVar] = std::max(grp->coutHausseHR_, config::configuration().noiseCost())
+            //                                   + config::configuration().adequacyCostOffset();
+            //         // A la baisse
+            //         pbXmin_[numVar + 1] = 0.0;
+            //         pbXmax_[numVar + 1] = 0.0;
+            //         pbCoutLineaire_[numVar + 1] = config::configuration().noiseCost();
+            //     }
+            // } else {
+            //     // P_min<0
+            //     // A la hausse
+            //     pbXmin_[numVar] = 0.;
+            //     pbXmax_[numVar] = grp->puisMax_ - grp->prodPobj_;
+            //     pbCoutLineaire_[numVar] = std::max(grp->coutHausseHR_, config::configuration().noiseCost())
+            //                               + config::configuration().adequacyCostOffset();
+            //     // A la baisse
+            //     pbXmin_[numVar + 1] = 0.;
+            //     pbXmax_[numVar + 1] = grp->prodPobj_ - grp->puisMin_;
+            //     pbCoutLineaire_[numVar + 1] = std::max(grp->coutBaisseHR_, config::configuration().noiseCost())
+            //                                   + config::configuration().adequacyCostOffset();
+            // }
+                
                 // P_min<=P_0
                 if (grp->puisMin_ <= grp->prodPobj_) {
                     // A la hausse
                     pbXmin_[numVar] = 0.0;
                     pbXmax_[numVar] = grp->puisMax_ - grp->prodPobj_;
-                    pbCoutLineaire_[numVar] = std::max(grp->coutHausseHR_, config::configuration().noiseCost())
-                                              + config::configuration().adequacyCostOffset();
+                    pbCoutLineaire_[numVar] = grp->coutHausseHR_ + config::configuration().noiseCost() + 
+                                                config::configuration().adequacyCostOffset();
+                    if (pbCoutLineaire_[numVar] < 0.0){
+                        pbCoutLineaire_[numVar] = config::configuration().noiseCost() + config::configuration().adequacyCostOffset();
+                        LOG(debug) << "cout hausse total HR de "<<grp->nom_<<" (numVar = "<<numVar<<
+                                    ") < 0 ; on pose pbCoutLineaire[numVar] = noiseCost + adequacyCostOffset";
+                    }
                     // A la baisse
                     pbXmin_[numVar + 1] = 0.0;
                     pbXmax_[numVar + 1] = grp->prodPobj_ - grp->puisMin_;
-                    pbCoutLineaire_[numVar + 1] = std::max(grp->coutBaisseHR_, config::configuration().noiseCost())
-                                                  + config::configuration().adequacyCostOffset();
-
+                    pbCoutLineaire_[numVar + 1] = grp->coutBaisseHR_ + config::configuration().noiseCost() + 
+                                                    config::configuration().adequacyCostOffset();
+                    if (pbCoutLineaire_[numVar + 1] < 0.0){
+                        pbCoutLineaire_[numVar + 1] = config::configuration().noiseCost() + config::configuration().adequacyCostOffset();
+                        LOG(debug) << "cout baisse total HR de "<<grp->nom_<<" (numVar = "<<numVar<<
+                                    ") < 0 ; on pose pbCoutLineaire[numVar] = noiseCost + adequacyCostOffset";
+                    }
                 } else { // P_min>P_0
                     // A la hausse
                     pbXmin_[numVar] = grp->puisMin_ - grp->prodPobj_;
                     pbXmax_[numVar] = grp->puisMax_ - grp->prodPobj_;
-                    pbCoutLineaire_[numVar] = std::max(grp->coutHausseHR_, config::configuration().noiseCost())
-                                              + config::configuration().adequacyCostOffset();
+                    pbCoutLineaire_[numVar] = grp->coutHausseHR_ + config::configuration().noiseCost() + 
+                                                config::configuration().adequacyCostOffset();
+                    if (pbCoutLineaire_[numVar] < 0.0){
+                        pbCoutLineaire_[numVar] = config::configuration().noiseCost() + config::configuration().adequacyCostOffset();
+                        LOG(debug) << "cout hausse total HR de "<<grp->nom_<<" (numVar = "<<numVar<<
+                                    ") < 0 ; on pose pbCoutLineaire[numVar] = noiseCost + adequacyCostOffset";
+                    }
                     // A la baisse
                     pbXmin_[numVar + 1] = 0.0;
                     pbXmax_[numVar + 1] = 0.0;
@@ -268,13 +321,23 @@ int Calculer::ecrireContraintesDeBordGroupesDodu()
                 // A la hausse
                 pbXmin_[numVar] = 0.;
                 pbXmax_[numVar] = grp->puisMax_ - grp->prodPobj_;
-                pbCoutLineaire_[numVar] = std::max(grp->coutHausseHR_, config::configuration().noiseCost())
-                                          + config::configuration().adequacyCostOffset();
+                pbCoutLineaire_[numVar] = grp->coutHausseHR_ + config::configuration().noiseCost() + 
+                                            config::configuration().adequacyCostOffset();
+                if (pbCoutLineaire_[numVar] < 0.0){
+                        pbCoutLineaire_[numVar] = config::configuration().noiseCost() + config::configuration().adequacyCostOffset();
+                        LOG(debug) << "cout hausse total HR de "<<grp->nom_<<" (numVar = "<<numVar<<
+                                    ") < 0 ; on pose pbCoutLineaire[numVar] = noiseCost + adequacyCostOffset";
+                }
                 // A la baisse
                 pbXmin_[numVar + 1] = 0.;
                 pbXmax_[numVar + 1] = grp->prodPobj_ - grp->puisMin_;
-                pbCoutLineaire_[numVar + 1] = std::max(grp->coutBaisseHR_, config::configuration().noiseCost())
-                                              + config::configuration().adequacyCostOffset();
+                pbCoutLineaire_[numVar + 1] = grp->coutBaisseHR_ + config::configuration().noiseCost() + 
+                                                config::configuration().adequacyCostOffset();
+                if (pbCoutLineaire_[numVar + 1] < 0.0){
+                        pbCoutLineaire_[numVar + 1] = config::configuration().noiseCost() + config::configuration().adequacyCostOffset();
+                        LOG(debug) << "cout baisse total HR de "<<grp->nom_<<" (numVar = "<<numVar<<
+                                    ") < 0 ; on pose pbCoutLineaire[numVar] = noiseCost + adequacyCostOffset";
+                }
             }
         } else { // Groupe deconnecte ou fixe HR
             // A la hausse
@@ -334,15 +397,32 @@ int Calculer::ecrireContraintesDeBordConsosDodu()
 
             consoNodale = conso->valeur_;
 
+            // if (consoNodale >= 0) {
+            //     pbXmin_[numVar] = 0.0;
+            //     pbXmax_[numVar] = conso->seuil_ * consoNodale;
+            //     pbCoutLineaire_[numVar] = std::max(conso->cout_, config::configuration().noiseCost())
+            //                               + config::configuration().adequacyCostOffset();
+            // } else {
+            //     pbXmin_[numVar] = conso->seuil_ * consoNodale;
+            //     pbXmax_[numVar] = 0.0;
+            //     pbCoutLineaire_[numVar] = -(std::max(conso->cout_, config::configuration().noiseCost())
+            //                                 + config::configuration().adequacyCostOffset());
+            // }
+
+            // if (pbXmax_[numVar] - pbXmin_[numVar] < config::constants::epsilon) {
+            //     pbTypeDeBorneDeLaVariable_[numVar] = VARIABLE_FIXE;
+            //     pbX_[numVar] = 0.;
+            // }
+
             if (consoNodale >= 0) {
                 pbXmin_[numVar] = 0.0;
                 pbXmax_[numVar] = conso->seuil_ * consoNodale;
-                pbCoutLineaire_[numVar] = std::max(conso->cout_, config::configuration().noiseCost())
-                                          + config::configuration().adequacyCostOffset();
+                pbCoutLineaire_[numVar] = conso->cout_ + config::configuration().noiseCost() + 
+                                            config::configuration().adequacyCostOffset();
             } else {
                 pbXmin_[numVar] = conso->seuil_ * consoNodale;
                 pbXmax_[numVar] = 0.0;
-                pbCoutLineaire_[numVar] = -(std::max(conso->cout_, config::configuration().noiseCost())
+                pbCoutLineaire_[numVar] = -(conso->cout_ + config::configuration().noiseCost()
                                             + config::configuration().adequacyCostOffset());
             }
 
@@ -394,13 +474,37 @@ int Calculer::ecrireContraintesDeBordTransformateurDephaseur()
         }
 
         // Ajout des variables x+ et x- pour penaliser le dephasage autour de la position initiale
+        // // x+
+        // pbX_[numVarTd] = 0.0;
+        // pbXmin_[numVarTd] = 0.0;
+        // pbXmax_[numVarTd] = max(puiMax - td->puiCons_, 0.);
+        // pbCoutLineaire_[numVarTd] = (config::configuration().usePenalisationTD() && !td->fictif_)
+        //                                 ? config::configuration().costTd()
+        //                                 : config::constants::zero_cost_variable;
+        // pbTypeDeBorneDeLaVariable_[numVarTd] = VARIABLE_BORNEE_DES_DEUX_COTES;
+
+        // if (pbXmax_[numVarTd] - pbXmin_[numVarTd] < config::constants::epsilon) {
+        //     pbTypeDeBorneDeLaVariable_[numVarTd] = VARIABLE_FIXE;
+        // }
+
+        // // x-
+        // pbX_[numVarTd + 1] = 0.0;
+        // pbXmin_[numVarTd + 1] = 0.0;
+        // pbXmax_[numVarTd + 1] = max(td->puiCons_ - puiMin, 0.);
+        // pbCoutLineaire_[numVarTd + 1] = (config::configuration().usePenalisationTD() && !td->fictif_)
+        //                                     ? config::configuration().costTd()
+        //                                     : config::constants::zero_cost_variable;
+        // pbTypeDeBorneDeLaVariable_[numVarTd + 1] = VARIABLE_BORNEE_DES_DEUX_COTES;
+
         // x+
         pbX_[numVarTd] = 0.0;
         pbXmin_[numVarTd] = 0.0;
         pbXmax_[numVarTd] = max(puiMax - td->puiCons_, 0.);
-        pbCoutLineaire_[numVarTd] = (config::configuration().usePenalisationTD() && !td->fictif_)
-                                        ? config::configuration().costTd()
-                                        : config::constants::zero_cost_variable;
+        if (config::configuration().usePenalisationTD() && !td->fictif_){
+            pbCoutLineaire_[numVarTd] = (td->coutTD_ > 0.0)
+                                        ? td->coutTD_
+                                        : config::configuration().costTd();
+        }else {pbCoutLineaire_[numVarTd] = config::constants::zero_cost_variable;}
         pbTypeDeBorneDeLaVariable_[numVarTd] = VARIABLE_BORNEE_DES_DEUX_COTES;
 
         if (pbXmax_[numVarTd] - pbXmin_[numVarTd] < config::constants::epsilon) {
@@ -411,9 +515,14 @@ int Calculer::ecrireContraintesDeBordTransformateurDephaseur()
         pbX_[numVarTd + 1] = 0.0;
         pbXmin_[numVarTd + 1] = 0.0;
         pbXmax_[numVarTd + 1] = max(td->puiCons_ - puiMin, 0.);
-        pbCoutLineaire_[numVarTd + 1] = (config::configuration().usePenalisationTD() && !td->fictif_)
-                                            ? config::configuration().costTd()
-                                            : config::constants::zero_cost_variable;
+        if (config::configuration().usePenalisationTD() && !td->fictif_){
+            if (td->coutTD_ > 0.0){
+                std::cout<<td->quadVrai_->nom_<<" : coutTD non nul, vaut "<<td->coutTD_<<std::endl;
+            }
+            pbCoutLineaire_[numVarTd + 1] = (td->coutTD_ > 0.0)
+                                        ? td->coutTD_
+                                        : config::configuration().costTd();
+        }else {pbCoutLineaire_[numVarTd + 1] = config::constants::zero_cost_variable;}
         pbTypeDeBorneDeLaVariable_[numVarTd + 1] = VARIABLE_BORNEE_DES_DEUX_COTES;
 
 
@@ -434,17 +543,38 @@ int Calculer::ecrireContraintesDeBordLignesCC()
         numVarCc = lcc->numVar_;
 
         // Ajout des variables x+ et x- pour avoir la plus petite variation de transit possible autour de P0
+        // // x+
+        // pbX_[numVarCc] = 0.0;
+        // pbXmin_[numVarCc] = 0.0;
+        // pbCoutLineaire_[numVarCc] = (config::configuration().usePenalisationHVDC()) ? config::configuration().costHvdc()
+        //                                                                             : 0.;
+        // // x-
+        // pbX_[numVarCc + 1] = 0.0;
+        // pbXmin_[numVarCc + 1] = 0.0;
+        // pbCoutLineaire_[numVarCc + 1] = (config::configuration().usePenalisationHVDC())
+        //                                     ? config::configuration().costHvdc()
+        //                                     : 0.;
+
         // x+
         pbX_[numVarCc] = 0.0;
         pbXmin_[numVarCc] = 0.0;
-        pbCoutLineaire_[numVarCc] = (config::configuration().usePenalisationHVDC()) ? config::configuration().costHvdc()
+        if (lcc->coutLigneCC_ != 0.0){
+            std::cout<<"LCC "<<lcc->nom_<<" : coutLigneCC non nul vaut "<<lcc->coutLigneCC_<<std::endl;
+            pbCoutLineaire_[numVarCc] = lcc->coutLigneCC_;
+        }else{
+            std::cout<<"LCC "<<lcc->nom_<<" : coutLigneCC = 0.0"<<std::endl;
+            pbCoutLineaire_[numVarCc] = (config::configuration().usePenalisationHVDC()) ? config::configuration().costHvdc()
                                                                                     : 0.;
+        }
         // x-
         pbX_[numVarCc + 1] = 0.0;
         pbXmin_[numVarCc + 1] = 0.0;
-        pbCoutLineaire_[numVarCc + 1] = (config::configuration().usePenalisationHVDC())
-                                            ? config::configuration().costHvdc()
-                                            : 0.;
+        if (lcc->coutLigneCC_ != 0.0){
+            pbCoutLineaire_[numVarCc + 1] = lcc->coutLigneCC_;
+        }else{
+            pbCoutLineaire_[numVarCc + 1] = (config::configuration().usePenalisationHVDC()) ? config::configuration().costHvdc()
+                                                                                    : 0.;
+        }
 
         if (lcc->type_ == LigneCC::PILOTAGE_PUISSANCE_IMPOSE || lcc->type_ == LigneCC::PILOTAGE_EMULATION_AC) {
             pbXmax_[numVarCc] = 0.;
@@ -1503,11 +1633,28 @@ int Calculer::ecrireCoupeTransit(const double& maxTprev,
             // cout<<" on ajoute la variable d'activation de la parade  "<< icdt->nom_<<endl;
             // prise en compte de la probabilite de l'incident si elle est définie
 
-            double proba = incidentPere->getProb();
+            // double proba = incidentPere->getProb();
 
-            icdt->numVarActivation_ = ajouterVariableEntiere(
-                icdt->num_,
-                config::constants::cost_parade * proba * static_cast<double>(incidentPere->contraintes_.size()));
+            // icdt->numVarActivation_ = ajouterVariableEntiere(
+            //     icdt->num_,
+                // config::constants::cost_parade * proba * static_cast<double>(incidentPere->contraintes_.size()));
+            if ((incidentPere->nom_ == "QUAD_ADTX" && icdt->nom_ == "QUAD_BIVO") ||
+                    (incidentPere->nom_ == "QUAD_AHIR" && icdt->nom_ == "QUAD_BIVN") || 
+                    (incidentPere->nom_ == "QUAD_AIXQ" && icdt->nom_ == "QUAD_BIVN") 
+                    ||
+                    (incidentPere->nom_ == "QUAD_AGMD" && icdt->nom_ == "QUAD_AGMD_NRF") ||
+                    (incidentPere->nom_ == "QUAD_ADTY" && icdt->nom_ == "QUAD_ADTY_NRF") ||
+                    (incidentPere->nom_ == "QUAD_AGUW" && icdt->nom_ == "QUAD_AGUW_NRF") ||
+                    (incidentPere->nom_ == "QUAD_AWAP" && icdt->nom_ == "QUAD_AWAP_NRF")
+                    ){
+                icdt->numVarActivation_ = ajouterVariableEntiere(
+                icdt->num_, 0.0001);
+            }
+            else{
+                icdt->numVarActivation_ = ajouterVariableEntiere(
+                icdt->num_, 1000);
+            }
+            
             if (coefs_.size() < static_cast<size_t>(pbNombreDeVariables_)) {
                 coefs_.resize(pbNombreDeVariables_, 0.);
             }
@@ -2644,8 +2791,9 @@ void Calculer::choixContraintesAajouter()
     }
 }
 
-void Calculer::addCurativeVariable(const std::shared_ptr<TransformateurDephaseur>& td, double proba, int numVarCur)
+void Calculer::addCurativeVariable(const std::shared_ptr<ElementCuratifTD>& elemCurTD, double proba, int numVarCur)
 {
+    std::shared_ptr<TransformateurDephaseur> td = elemCurTD->td_;
     // curatif TD
     typeEtat_.push_back(DEPH_CUR_H);
     pbXmin_.push_back(0.);
@@ -2655,20 +2803,27 @@ void Calculer::addCurativeVariable(const std::shared_ptr<TransformateurDephaseur
     pbXmax_.push_back(std::max(td->puiMax_ - td->puiMin_, 0.));
     // Penalisation du curatif
     if (config::configuration().usePenalisationTD()) {
-        pbCoutLineaire_.push_back(config::configuration().costTd() * proba);
-        pbCoutLineaire_.push_back(config::configuration().costTd() * proba);
+        if (elemCurTD->coutHausse_ != -config::constants::valdef){
+            pbCoutLineaire_.push_back(elemCurTD->coutHausse_ * proba);
+            pbCoutLineaire_.push_back(elemCurTD->coutHausse_ * proba);
+        }else{
+            pbCoutLineaire_.push_back(config::configuration().costTd() * proba);
+            pbCoutLineaire_.push_back(config::configuration().costTd() * proba);
+        }
         pbCoutLineaireSansOffset_.push_back(0.);
         pbCoutLineaireSansOffset_.push_back(0.);
     } else {
         pbCoutLineaire_.resize(pbNombreDeVariables_, 0.);
         pbCoutLineaireSansOffset_.resize(pbNombreDeVariables_, 0.);
     }
+    std::cout<<"pbCoutLineaire pour TD "<<td->quadVrai_->nom_<<" = "<<pbCoutLineaire_.back()<<std::endl;
 
     ajouterContraintesBorneCuratif(td->numVar_, numVarCur, td->puiMin_ - td->puiCons_, td->puiMax_ - td->puiCons_);
 }
 
-void Calculer::addCurativeVariable(const std::shared_ptr<TransformateurDephaseur>& td_fictive)
+void Calculer::addCurativeVariable(const std::shared_ptr<ElementCuratifTD>& elemCurTDFictif, double proba)
 {
+    std::shared_ptr<TransformateurDephaseur>& td_fictive = elemCurTDFictif->td_;
     // Le curatif du TD fictif ne prend pas en compte la position preventive
     typeEtat_.push_back(DEPH_CUR_H);
     pbXmin_.push_back(0.);
@@ -2676,12 +2831,20 @@ void Calculer::addCurativeVariable(const std::shared_ptr<TransformateurDephaseur
     typeEtat_.push_back(DEPH_CUR_B);
     pbXmin_.push_back(0.);
     pbXmax_.push_back(-td_fictive->puiMin_);
-    pbCoutLineaire_.resize(pbNombreDeVariables_, config::constants::zero_cost_variable);
-    pbCoutLineaireSansOffset_.resize(pbNombreDeVariables_, config::constants::zero_cost_variable);
+    if (elemCurTDFictif->coutHausse_ != -config::constants::valdef){
+        pbCoutLineaire_.push_back(elemCurTDFictif->coutHausse_ * proba);
+        pbCoutLineaire_.push_back(elemCurTDFictif->coutHausse_ * proba);
+    }else{
+        pbCoutLineaire_.resize(pbNombreDeVariables_, config::constants::zero_cost_variable);
+        pbCoutLineaireSansOffset_.resize(pbNombreDeVariables_, config::constants::zero_cost_variable);
+    }
+    std::cout<<"pbCoutLineaire pour TD "<<td_fictive->quadVrai_->nom_<<" = "<<pbCoutLineaire_.back()<<std::endl;
+    
 }
 
-void Calculer::addCurativeVariable(const std::shared_ptr<LigneCC>& lcc, double proba, int numVarCur)
+void Calculer::addCurativeVariable(const std::shared_ptr<ElementCuratifHVDC>& elemCurHVDC, double proba, int numVarCur)
 {
+    std::shared_ptr<LigneCC>& lcc = elemCurHVDC->lcc_;
     // curatif HVDC
     typeEtat_.push_back(HVDC_CUR_H);
     pbXmin_.push_back(0.);
@@ -2691,35 +2854,74 @@ void Calculer::addCurativeVariable(const std::shared_ptr<LigneCC>& lcc, double p
     pbXmax_.push_back(std::max(lcc->puiMax_ - lcc->puiMin_, 0.));
     // Penalisation du curatif
     if (config::configuration().usePenalisationHVDC()) {
-        pbCoutLineaire_.push_back(config::configuration().costHvdc() * proba);
-        pbCoutLineaire_.push_back(config::configuration().costHvdc() * proba);
+        if (elemCurHVDC->coutHausse_ != -config::constants::valdef){
+            std::cout<<"Pour le curatif de LCC "<<lcc->nom_<<" on utilise coutHausse qui vaut "<<elemCurHVDC->coutHausse_<<std::endl;
+            pbCoutLineaire_.push_back(elemCurHVDC->coutHausse_ * proba);
+            pbCoutLineaire_.push_back(elemCurHVDC->coutHausse_ * proba);
+        }else{
+            pbCoutLineaire_.push_back(config::configuration().costHvdc() * proba);
+            pbCoutLineaire_.push_back(config::configuration().costHvdc() * proba);
+            std::cout<<"Pour le curatif de LCC "<<lcc->nom_<<" on utilise costHvdc() qui vaut "<<config::configuration().costHvdc() <<std::endl;
+        }
         pbCoutLineaireSansOffset_.push_back(0.);
         pbCoutLineaireSansOffset_.push_back(0.);
     } else {
         pbCoutLineaire_.resize(pbNombreDeVariables_, 0.);
         pbCoutLineaireSansOffset_.resize(pbNombreDeVariables_, 0.);
     }
+    std::cout<<"pbCoutLineaire pour LCC "<<lcc->nom_<<" = "<<pbCoutLineaire_.back()<<std::endl;    
 
     ajouterContraintesBorneCuratif(lcc->numVar_, numVarCur, lcc->puiMin_ - lcc->puiCons_, lcc->puiMax_ - lcc->puiCons_);
 }
 
-void Calculer::addCurativeVariable(const std::shared_ptr<Groupe>& grp, double proba, int numVarCur)
+void Calculer::addCurativeVariable(const std::shared_ptr<ElementCuratifGroupe>& elemCurGrp, double proba, int numVarCur)
 {
+    const std::shared_ptr<Groupe>& grp = elemCurGrp->groupe_;
     // curatif Groupe
     typeEtat_.push_back(GRP_CUR_H);
     pbXmin_.push_back(0.);
     pbXmax_.push_back(std::max(grp->puisMax_ - grp->puisMin_, 0.));
-    double value = std::max(grp->coutHausseAR_, config::configuration().noiseCost())
-                   + config::configuration().redispatchCostOffset();
-    pbCoutLineaire_.push_back(value * proba);
-    pbCoutLineaireSansOffset_.push_back((grp->coutHausseAR_) * proba);
+    if (elemCurGrp->coutHausse_ != -config::constants::valdef){
+        double value = config::configuration().noiseCost() + config::configuration().redispatchCostOffset() + elemCurGrp->coutHausse_;
+        if (value < 0.0) {
+            LOG(debug) << "cout total curatif de "<<grp->nom_<<" (numVarCur = "<<numVarCur<<
+                ") < 0 ; on pose value = noiseCost + RedispatchCostOffset";
+            value = config::configuration().noiseCost() + config::configuration().redispatchCostOffset();
+        }
+        pbCoutLineaire_.push_back(value * proba);
+        pbCoutLineaireSansOffset_.push_back((elemCurGrp->coutHausse_) * proba);
+    }else{
+        double value = config::configuration().noiseCost() + config::configuration().redispatchCostOffset() + grp->coutHausseAR_;
+        if (value < 0.0) {
+            LOG(debug) << "cout total curatif de "<<grp->nom_<<" (numVarCur = "<<numVarCur<<
+                ") < 0 ; on pose value = noiseCost + RedispatchCostOffset";
+            value = config::configuration().noiseCost() + config::configuration().redispatchCostOffset();
+        }
+        pbCoutLineaire_.push_back(value * proba);
+        pbCoutLineaireSansOffset_.push_back((grp->coutHausseAR_) * proba);
+    }
     typeEtat_.push_back(GRP_CUR_B);
     pbXmin_.push_back(0.);
     pbXmax_.push_back(std::max(grp->puisMax_ - grp->puisMin_, 0.));
-    value = std::max(grp->coutBaisseAR_, config::configuration().noiseCost())
-            + config::configuration().redispatchCostOffset();
-    pbCoutLineaire_.push_back(value * proba);
-    pbCoutLineaireSansOffset_.push_back((grp->coutBaisseAR_) * proba);
+    if (elemCurGrp->coutBaisse_ != -config::constants::valdef){
+        double value = config::configuration().noiseCost() + config::configuration().redispatchCostOffset() + elemCurGrp->coutBaisse_;
+        if (value > 0.0) {
+            LOG(debug) << "cout total curatif de "<<grp->nom_<<" (numVarCur = "<<numVarCur<<
+                ") < 0 ; on pose value = noiseCost + RedispatchCostOffset";
+            value = config::configuration().noiseCost() + config::configuration().redispatchCostOffset();
+        }
+        pbCoutLineaire_.push_back(value * proba);
+        pbCoutLineaireSansOffset_.push_back((elemCurGrp->coutBaisse_) * proba);
+    }else{
+        double value = config::configuration().noiseCost() + config::configuration().redispatchCostOffset() + grp->coutBaisseAR_;
+        if (value < 0.0) {
+            LOG(debug) << "cout total curatif de "<<grp->nom_<<" (numVarCur = "<<numVarCur<<
+                ") < 0 ; on pose value = noiseCost + RedispatchCostOffset";
+            value = config::configuration().noiseCost() + config::configuration().redispatchCostOffset();
+        }
+        pbCoutLineaire_.push_back(value * proba);
+        pbCoutLineaireSansOffset_.push_back((grp->coutBaisseAR_) * proba);
+    }
     ajouterContraintesBorneCuratifGroupe(grp->numVarGrp_, numVarCur, grp);
 }
 
@@ -2729,14 +2931,16 @@ void Calculer::addCurativeVariable(const std::shared_ptr<Consommation>& conso, d
     typeEtat_.push_back(CONSO_H);
     pbXmin_.push_back(0.);
     pbXmax_.push_back(0.);
-    double value = std::max(conso->coutEffacement_, config::configuration().noiseCost())
-                   + config::configuration().redispatchCostOffset();
+    double value = config::configuration().noiseCost() + config::configuration().redispatchCostOffset() + conso->coutEffacement_;
+    if (value < 0.0){ 
+        value = config::configuration().noiseCost() + config::configuration().redispatchCostOffset();
+        LOG(debug) << "cout total curatif de "<<conso->nom_<<" (numVarCur = "<<numVarCur<<
+                ") négatif ; on pose value = noiseCost + RedispatchCostOffset";
+    }
     pbCoutLineaire_.push_back(value * proba);
     pbCoutLineaireSansOffset_.push_back((conso->coutEffacement_) * proba);
     typeEtat_.push_back(CONSO_B);
     pbXmin_.push_back(0.);
-    value = std::max(conso->coutEffacement_, config::configuration().noiseCost())
-            + config::configuration().redispatchCostOffset();
     pbCoutLineaire_.push_back(value * proba);
     pbCoutLineaireSansOffset_.push_back((conso->coutEffacement_) * proba);
     double effacementMax = conso->pourcentEffacement_ * conso->valeur_;
@@ -2777,16 +2981,16 @@ int Calculer::ajouterVariablesCuratives(const std::shared_ptr<ElementCuratif>& e
 
     switch (elem->typeElem_) {
         case ElementCuratif::TD:
-            addCurativeVariable(std::dynamic_pointer_cast<ElementCuratifTD>(elem)->td_, proba, numVarCur);
+            addCurativeVariable(std::dynamic_pointer_cast<ElementCuratifTD>(elem), proba, numVarCur);
             break;
         case ElementCuratif::TD_FICTIF:
-            addCurativeVariable(std::dynamic_pointer_cast<ElementCuratifTD>(elem)->td_);
+            addCurativeVariable(std::dynamic_pointer_cast<ElementCuratifTD>(elem), proba);
             break;
         case ElementCuratif::HVDC:
-            addCurativeVariable(std::dynamic_pointer_cast<ElementCuratifHVDC>(elem)->lcc_, proba, numVarCur);
+            addCurativeVariable(std::dynamic_pointer_cast<ElementCuratifHVDC>(elem), proba, numVarCur);
             break;
         case ElementCuratif::GROUPE:
-            addCurativeVariable(std::dynamic_pointer_cast<ElementCuratifGroupe>(elem)->groupe_, proba, numVarCur);
+            addCurativeVariable(std::dynamic_pointer_cast<ElementCuratifGroupe>(elem), proba, numVarCur);
             break;
         case ElementCuratif::CONSO:
             addCurativeVariable(std::dynamic_pointer_cast<ElementCuratifConso>(elem)->conso_, proba, numVarCur);
@@ -2814,6 +3018,65 @@ int Calculer::ajouterVariableEntiere(int num, double cost)
     LOG(debug) << "Ajout de la variable entiere " << indNewVar
                << " pour l'element curatif (TD, HVDC ou parade) : " << num;
     pbNombreDeVariables_++;
+
+    // for (auto ic = res_.incidentsEtParades_.begin();ic!=res_.incidentsEtParades_.end();++ic){
+    //     if (ic->get()->num_ == (unsigned int) num){
+    //         if (
+    //             (ic->get()->incTraiteCur_->nom_ == "QUAD_ADTX" && ic->get()->nom_ == "QUAD_BIVO") ||
+    //                 (ic->get()->incTraiteCur_->nom_ == "QUAD_AHIR" && ic->get()->nom_ == "QUAD_BIVN") || 
+    //                 (ic->get()->incTraiteCur_->nom_ == "QUAD_AIXQ" && ic->get()->nom_ == "QUAD_BIVN")
+    //             ){
+    //             numSupportEtat_.push_back(num);
+    //             pbTypeDeBorneDeLaVariable_.push_back(VARIABLE_FIXE);
+    //             pbPositionDeLaVariable_.push_back(HORS_BASE_SUR_BORNE_SUP);
+    //             pbTypeDeVariable_.push_back(ENTIER);
+
+    //             typeEtat_.push_back(VAR_ENT);
+    //             pbXmin_.push_back(1);
+    //             pbXmax_.push_back(1);
+    //             pbX_.push_back(1);
+
+    //             // cout de la nouvelle variable
+    //             pbCoutLineaire_.push_back(cost);
+    //             pbCoutLineaireSansOffset_.push_back(0.);
+
+    //             // Variable entiere : on change de solveur
+    //             typeSolveur_ = UTILISATION_PNE_SOLVEUR;           
+    //         }else if(ic->get()->nom_.find("NRF") != std::string::npos && ic->get()->nom_ != "PARADE_NRF"){
+    //             numSupportEtat_.push_back(num);
+    //             pbTypeDeBorneDeLaVariable_.push_back(VARIABLE_BORNEE_DES_DEUX_COTES);
+    //             pbPositionDeLaVariable_.push_back(HORS_BASE_SUR_BORNE_SUP);
+    //             pbTypeDeVariable_.push_back(ENTIER);
+
+    //             typeEtat_.push_back(VAR_ENT);
+    //             pbXmin_.push_back(0);
+    //             pbXmax_.push_back(1);
+    //             pbX_.push_back(1);
+
+    //             // cout de la nouvelle variable
+    //             pbCoutLineaire_.push_back(cost);
+    //             pbCoutLineaireSansOffset_.push_back(0.);
+    //         }
+    //         else{
+    //              numSupportEtat_.push_back(num);
+    //             pbTypeDeBorneDeLaVariable_.push_back(VARIABLE_FIXE);
+    //             pbPositionDeLaVariable_.push_back(HORS_BASE_SUR_BORNE_SUP);
+    //             pbTypeDeVariable_.push_back(ENTIER);
+
+    //             typeEtat_.push_back(VAR_ENT);
+    //             pbXmin_.push_back(0);
+    //             pbXmax_.push_back(0);
+    //             pbX_.push_back(0);
+
+    //             // cout de la nouvelle variable
+    //             pbCoutLineaire_.push_back(cost);
+    //             pbCoutLineaireSansOffset_.push_back(0.);
+
+    //             // Variable entiere : on change de solveur
+    //             typeSolveur_ = UTILISATION_PNE_SOLVEUR;
+    //         }
+    //     }
+    // }
 
     numSupportEtat_.push_back(num);
     pbTypeDeBorneDeLaVariable_.push_back(VARIABLE_BORNEE_DES_DEUX_COTES);
@@ -3689,11 +3952,28 @@ int Calculer::ajoutContraintes(bool& existe_contrainte_active,
 
                     // le poids de l'activation de la parade dépend de la probabilité de l'incident relatif à cette
                     // parade
-                    double proba = icdt->getProb();
+                    // double proba = icdt->getProb();
 
-                    parade->numVarActivation_ = ajouterVariableEntiere(
-                        parade->num_,
-                        config::constants::cost_parade * proba * static_cast<double>(icdt->contraintes_.size()));
+                    // parade->numVarActivation_ = ajouterVariableEntiere(
+                    //     parade->num_,
+                    //     config::constants::cost_parade * proba * static_cast<double>(icdt->contraintes_.size()));
+
+                    if ((parade->incTraiteCur_->nom_ == "QUAD_ADTX" && parade->nom_ == "QUAD_BIVO") ||
+                    (parade->incTraiteCur_->nom_ == "QUAD_AHIR" && parade->nom_ == "QUAD_BIVN") || 
+                    (parade->incTraiteCur_->nom_ == "QUAD_AIXQ" && parade->nom_ == "QUAD_BIVN") 
+                    ||
+                    (parade->incTraiteCur_->nom_ == "QUAD_AGMD" && parade->nom_ == "QUAD_AGMD_NRF") ||
+                    (parade->incTraiteCur_->nom_ == "QUAD_ADTY" && parade->nom_ == "QUAD_ADTY_NRF") ||
+                    (parade->incTraiteCur_->nom_ == "QUAD_AGUW" && parade->nom_ == "QUAD_AGUW_NRF") ||
+                    (parade->incTraiteCur_->nom_ == "QUAD_AWAP" && parade->nom_ == "QUAD_AWAP_NRF")
+                    ){
+                        parade->numVarActivation_ = ajouterVariableEntiere(
+                        parade->num_, 0.0001);
+                    }
+                    else{
+                        parade->numVarActivation_ = ajouterVariableEntiere(
+                        parade->num_, 1000);
+                    }
 
                     if (!parade->contraintesAutorisees_.empty()
                         && parade->contraintesAutorisees_.find(contrainte->elemAS_)
@@ -4309,14 +4589,30 @@ int Calculer::fixerProdSansReseau()
                 pbCoutLineaire_[numVar] = (config.computationType()
                                            == config::Configuration::ComputationType::OPF_WITHOUT_REDISPATCH)
                                               ? 0.
-                                              : std::max(grpe->coutHausseAR_, config::configuration().noiseCost())
-                                                    + config::configuration().redispatchCostOffset();
+                                              : ((-config::configuration().noiseCost()>grpe->coutHausseAR_)?
+                                                config::configuration().noiseCost() + config::configuration().redispatchCostOffset():
+                                                config::configuration().noiseCost() + config::configuration().redispatchCostOffset() + grpe->coutHausseAR_);
                 pbX_[numVar + 1] = 0.0;
                 pbCoutLineaire_[numVar + 1] = (config.computationType()
                                                == config::Configuration::ComputationType::OPF_WITHOUT_REDISPATCH)
                                                   ? 0.
-                                                  : std::max(grpe->coutBaisseAR_, config::configuration().noiseCost())
-                                                        + config::configuration().redispatchCostOffset();
+                                                  : ((-config::configuration().noiseCost()>grpe->coutBaisseAR_)?
+                                                    config::configuration().noiseCost() + config::configuration().redispatchCostOffset():
+                                                    config::configuration().noiseCost() + config::configuration().redispatchCostOffset() + grpe->coutBaisseAR_);
+            // if (grpe->prodAjust_ == Groupe::OUI_HR_AR || grpe->prodAjust_ == Groupe::OUI_AR) {
+            //     const auto& config = config::configuration();
+            //     pbX_[numVar] = 0.0;
+            //     pbCoutLineaire_[numVar] = (config.computationType()
+            //                                == config::Configuration::ComputationType::OPF_WITHOUT_REDISPATCH)
+            //                                   ? 0.
+            //                                   : std::max(grpe->coutHausseAR_, config::configuration().noiseCost())
+            //                                         + config::configuration().redispatchCostOffset();
+            //     pbX_[numVar + 1] = 0.0;
+            //     pbCoutLineaire_[numVar + 1] = (config.computationType()
+            //                                    == config::Configuration::ComputationType::OPF_WITHOUT_REDISPATCH)
+            //                                       ? 0.
+            //                                       : std::max(grpe->coutBaisseAR_, config::configuration().noiseCost())
+            //                                             + config::configuration().redispatchCostOffset();
                 pbXmin_[numVar] = 0.0;
                 pbXmax_[numVar] = (config.computationType()
                                    == config::Configuration::ComputationType::OPF_WITHOUT_REDISPATCH)
@@ -4339,9 +4635,41 @@ int Calculer::fixerProdSansReseau()
                 pbXmax_[numVar + 1] = 0.;
             }
 
+            if (grpe->nom_ == "GROUP_BUNJ"){
+                pbXmax_[numVar + 1] = 489.3498;
+            }
+            if (grpe->nom_ == "GROUP_CJWW"){
+                pbXmax_[numVar] = 10.0938;
+            }
+
             // Remarque traitements effectues pour la resolution du probleme
             pbTypeDeBorneDeLaVariable_[numVar] = VARIABLE_BORNEE_DES_DEUX_COTES;
             pbTypeDeBorneDeLaVariable_[numVar + 1] = VARIABLE_BORNEE_DES_DEUX_COTES;
+
+            // if (grpe->nom_ != "GROUP_BKMV" &&
+            // grpe->nom_ != "GROUP_BKMW" &&
+            // grpe->nom_ != "GROUP_BKMX" &&
+            // grpe->nom_ != "GROUP_BODZ" &&
+            // grpe->nom_ != "GROUP_BSKK" &&
+            // grpe->nom_ != "GROUP_BTTW" &&
+            // grpe->nom_ != "GROUP_BTTY" &&
+            // grpe->nom_ != "GROUP_BUNJ" &&
+            // grpe->nom_ != "GROUP_BVSU" &&
+            // grpe->nom_ != "GROUP_BXIB" &&
+            // grpe->nom_ != "GROUP_BXOD" &&
+            // grpe->nom_ != "GROUP_BYUE" &&
+            // grpe->nom_ != "GROUP_CHOD" &&
+            // grpe->nom_ != "GROUP_CJWW" &&
+            // grpe->nom_ != "GROUP_COQU" &&
+            // grpe->nom_ != "GROUP_COQV" &&
+            // grpe->nom_ != "GROUP_CJWX" &&
+            // grpe->nom_ != "GROUP_CAEN"
+            // ){
+            //     pbX_[numVar] = 0.0;
+            //     pbX_[numVar + 1] = 0.0;
+            //     pbXmin_[numVar] = pbXmax_[numVar];
+            //     pbXmin_[numVar + 1] = pbXmax_[numVar + 1];
+            // }
 
             if (pbXmax_[numVar] - pbXmin_[numVar] < config::constants::epsilon) {
                 pbTypeDeBorneDeLaVariable_[numVar] = VARIABLE_FIXE;
@@ -4354,6 +4682,22 @@ int Calculer::fixerProdSansReseau()
         }
         // mise a jour des couts des groupes pour le redispatching
     }
+
+    for (const auto& elem : res_.consos_) {
+        const auto& conso = elem.second;
+        int numVar = conso->numVarConso_;
+        if (numVar > 0){
+            if (conso->valeur_ >= 0) {
+                pbCoutLineaire_[numVar] = conso->coutAR_ + config::configuration().noiseCost() + 
+                                            config::configuration().redispatchCostOffset();
+            } else {
+                pbCoutLineaire_[numVar] = -(conso->coutAR_ + config::configuration().noiseCost()
+                                            + config::configuration().redispatchCostOffset());
+            }
+        }
+    }
+    // mise à jour des couts des consos pour le redispatching (Fonctionnalité pour les tests seuls)
+
     return METRIX_PAS_PROBLEME;
 }
 

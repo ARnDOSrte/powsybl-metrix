@@ -638,6 +638,10 @@ void Reseau::lireDonnees()
         conso->cout_ = (i >= config.tnvacouDIE().size() || config.tnvacouDIE()[i] == config::constants::valdef)
                            ? config::configuration().costFailure()
                            : config.tnvacouDIE()[i];
+        
+        conso->coutAR_ = (i >= config.tnvacouDIE().size() || config.tnvacouDIE()[i] == config::constants::valdef)
+                           ? config::configuration().costFailure()
+                           : config.tnvacouDIE()[i];
 
         // Lecture des incidents a traiter en curatif:
         if (config::configuration().computationType() == config::Configuration::ComputationType::OPF
@@ -931,6 +935,7 @@ void Reseau::lireDonnees()
             auto elemC = std::make_shared<ElementCuratifTD>(td);
 
             inc->listeElemCur_.push_back(elemC);
+            inc->tdNameElemCur_.insert({td->quadVrai_->nom_, elemC});
             if (td->fictif_) {
                 inc->tdFictifsElemCur_.insert(
                     std::pair<std::shared_ptr<Quadripole>, std::shared_ptr<ElementCuratifTD>>(td->quadVrai_, elemC));
@@ -990,6 +995,8 @@ void Reseau::lireDonnees()
 
             auto elemC = std::make_shared<ElementCuratifGroupe>(grp);
             inc->listeElemCur_.push_back(elemC);
+            inc->grpNameElemCur_.insert(
+                std::pair<std::string, std::shared_ptr<ElementCuratifGroupe>>(grp->nom_, elemC));
         }
     }
 
@@ -1011,6 +1018,8 @@ void Reseau::lireDonnees()
 
             auto elemC = std::make_shared<ElementCuratifConso>(conso);
             inc->listeElemCur_.push_back(elemC);
+            inc->consoNameElemCur_.insert(
+                std::pair<std::string, std::shared_ptr<ElementCuratifConso>>(conso->nom_, elemC));
         }
     }
 
@@ -1368,6 +1377,81 @@ double ElementASurveiller::seuilMin(const std::shared_ptr<Incident>& icdt) const
 double ElementASurveiller::seuil(const std::shared_ptr<Incident>& icdt, double transit) const
 {
     return transit >= 0 ? seuilMax(icdt) : seuilMin(icdt);
+}
+
+std::string ElementASurveiller::nomSeuilMax(const std::shared_ptr<Incident>& icdt) const
+{
+    const auto& config = config::configuration();
+    if (!icdt) {
+        return "QATI00MN";
+    }
+
+    if (icdt->parade_) {
+        if (icdt->incTraiteCur_->incidentComplexe_ && seuilMaxIncComplexe_ != config::constants::valdef) {
+            return "QATI20MN";
+        }
+
+        return "QATI5MNS";
+    }
+
+    if (icdt->paradesActivees_) {
+        if (icdt->incidentComplexe_ && seuilMaxAvantCurIncComplexe_ != config::constants::valdef) {
+            return "QATITAMK";
+        }
+
+        return "QATITAMN";
+    }
+
+    if (icdt->incidentComplexe_ && seuilMaxIncComplexe_ != config::constants::valdef) {
+        auto tupleThreshold = config.nameThresholdMaxITAM(seuilMaxIncComplexe_, "QATI20MN", seuilMaxAvantCurIncComplexe_, "QATITAMK");
+        return std::get<0>(tupleThreshold);
+    }
+
+    auto tupleThreshold = config.nameThresholdMaxITAM(seuilMaxInc_, "QATI5MNS", seuilMaxAvantCur_, "QATITAMN");
+    return std::get<0>(tupleThreshold);
+}
+
+std::string ElementASurveiller::nomSeuilMin(const std::shared_ptr<Incident>& icdt) const
+{
+    const auto& config = config::configuration();
+    auto checkNameThreshold = [&icdt, this](double threshold, string nomThreshold) {
+        return (threshold != config::constants::valdef) ? nomThreshold : nomSeuilMax(icdt);
+    };
+    if (seuilsAssymetriques_) {
+        if (!icdt) {
+            return "QATI00MN2";
+        }
+
+        if (icdt->parade_) {
+            if (icdt->incTraiteCur_->incidentComplexe_) {
+                return checkNameThreshold(seuilMaxIncComplexeExOr_, "QATI20MN2");
+            }
+            return checkNameThreshold(seuilMaxIncExOr_, "QATI5MNS2");
+        }
+
+        if (icdt->paradesActivees_) {
+            if (icdt->incidentComplexe_) {
+                return checkNameThreshold(seuilMaxAvantCurIncComplexeExOr_, "QATITAMK2");
+            }
+            return checkNameThreshold(seuilMaxAvantCurExOr_, "QATITAMN2");
+        }
+
+        if (icdt->incidentComplexe_) {
+            auto tupleThreshold = config.nameThresholdMaxITAM(seuilMaxIncComplexeExOr_, "QATI20MN2", seuilMaxAvantCurIncComplexeExOr_, "QATITAMK2");
+            return checkNameThreshold(std::get<1>(tupleThreshold), std::get<0>(tupleThreshold));
+        }
+
+        auto  tupleThreshold = config.nameThresholdMaxITAM(seuilMaxIncExOr_, "QATI5MNS2", seuilMaxAvantCurExOr_, "QATITAMN2");
+        return checkNameThreshold(std::get<1>(tupleThreshold), std::get<0>(tupleThreshold));
+    }
+
+    return nomSeuilMax(icdt);
+}
+
+
+std::string ElementASurveiller::nomSeuil(const std::shared_ptr<Incident>& icdt, double transit) const
+{
+    return transit >= 0 ? nomSeuilMax(icdt) : nomSeuilMin(icdt);
 }
 
 void ElementASurveiller::verificationSeuils() const
@@ -1769,8 +1853,21 @@ int Reseau::modifReseau(const std::shared_ptr<Variante>& var)
     for (const auto& elem : var->coutEfface_) {
         elem.first->coutEffacement_ = elem.second;
 
-        LOG(debug) << "le cout d'effacement : " << elem.first->nom_
+        LOG(debug) << "le cout d'effacement en curatif : " << elem.first->nom_
                    << " est modife, nouvelle valeur est: " << elem.first->coutEffacement_;
+    }
+
+    for (const auto& elem : var->coutEffaceHr_) {
+        elem.first->cout_ = elem.second;
+
+        LOG(debug) << "le cout d'effacement en preventif : " << elem.first->nom_
+                   << " est modife, nouvelle valeur est: " << elem.first->cout_;
+    }
+
+    for (const auto& elem : var->coutEffaceAr_) {
+        elem.first->coutAR_ = elem.second;
+        LOG(debug) << "le cout d'effacement en preventif : " << elem.first->nom_
+                   << " est modife, nouvelle valeur est: " << elem.first->coutAR_;
     }
 
     // X - bilan zonal en jouant sur la consommation
@@ -1861,8 +1958,13 @@ int Reseau::modifReseau(const std::shared_ptr<Variante>& var)
             elemAS->seuilMaxN_ = lcc->puiMax_;
             elemAS->seuilMaxInc_ = lcc->puiMax_;
             elemAS->seuilMaxIncComplexe_ = lcc->puiMax_;
-            elemAS->seuilMaxAvantCur_ = lcc->puiMax_;
+            elemAS->seuilMaxAvantCur_ = lcc->puiMax_;            
         }
+    }
+
+    for (auto& elem : var->dcVariantCost_) {
+        const auto& lcc = elem.first;
+        lcc->coutLigneCC_ = elem.second;
     }
 
     // XII-Puissance de consigne des HVDCs
@@ -1891,6 +1993,11 @@ int Reseau::modifReseau(const std::shared_ptr<Variante>& var)
             continue;
         }
         td->puiCons_ = elem.second;
+    }
+
+    for (auto& elem : var->tdVariantCost_) {
+        const auto& td = elem.first;
+        td->coutTD_ = elem.second;
     }
 
     // XIV-Seuils des quadripoles
@@ -1954,6 +2061,47 @@ int Reseau::modifReseau(const std::shared_ptr<Variante>& var)
         // Modification de la probabilite de défaut
         const auto& icdt = elem.first;
         icdt->probabilite_ = elem.second;
+    }
+
+    // XVI-Cout des éléments curatifs
+    //----------------------------
+    for (const auto& ict : var->usedCurativeGroupH_) {
+        //Modification du coût à la hausse des groupes en curatif
+        for(const auto& elemCurCost : ict.second){
+            // const auto& tt = elemCurCost[0];
+            const auto& elemCur = std::get<config::VariantConfiguration::NAME>(elemCurCost);
+            double cost = std::get<config::VariantConfiguration::VALUE>(elemCurCost);
+            elemCur->coutHausse_ = cost;
+        }
+    }
+
+    for (const auto& ict : var->usedCurativeGroupB_) {
+        //Modification du coût à la hausse des groupes en curatif
+        for(const auto& elemCurCost : ict.second){
+            const auto& elemCur = std::get<config::VariantConfiguration::NAME>(elemCurCost);
+            double cost = std::get<config::VariantConfiguration::VALUE>(elemCurCost);
+            elemCur->coutBaisse_ = cost;
+        }
+    }
+
+    for (const auto& ict : var->usedCurativeHVDC_) {
+        //Modification du coût à la hausse des groupes en curatif
+        for(const auto& elemCurCost : ict.second){
+            const auto& elemCur = std::get<config::VariantConfiguration::NAME>(elemCurCost);
+            double cost = std::get<config::VariantConfiguration::VALUE>(elemCurCost);
+            elemCur->coutBaisse_ = cost;
+            elemCur->coutHausse_ = cost;
+        }
+    }
+
+    for (const auto& ict : var->usedCurativeTD_) {
+        //Modification du coût à la hausse des groupes en curatif
+        for(const auto& elemCurCost : ict.second){
+            const auto& elemCur = std::get<config::VariantConfiguration::NAME>(elemCurCost);
+            double cost = std::get<config::VariantConfiguration::VALUE>(elemCurCost);
+            elemCur->coutBaisse_ = cost;
+            elemCur->coutHausse_ = cost;
+        }
     }
 
     // A la fin : Application des bilans zonaux (ex-X)
@@ -2202,6 +2350,22 @@ int Reseau::resetReseau(const std::shared_ptr<Variante>& var, bool toutesConsos)
             const auto& conso = consosIt->first;
             conso->coutEffacement_ = conso->coutEffacementBase_;
 
+            LOG(debug) << "le cout a la baisse curatif : " << conso->nom_ << " est remis a jour a son etat de base";
+        }
+
+        for (unsigned int i = 0; i < static_cast<unsigned int>(nbConsos_); ++i) {
+            auto conso = consos_.at(config::configuration().tnnomnoeDIE()[i]);
+            conso->cout_ = (i >= config::configuration().tnvacouDIE().size() || config::configuration().tnvacouDIE()[i] == config::constants::valdef)
+                            ? config::configuration().costFailure()
+                            : config::configuration().tnvacouDIE()[i];
+            LOG(debug) << "le cout a la baisse HR : " << conso->nom_ << " est remis a jour a son etat de base";
+        }
+
+        for (unsigned int i = 0; i < static_cast<unsigned int>(nbConsos_); ++i) {
+            auto conso = consos_.at(config::configuration().tnnomnoeDIE()[i]);
+            conso->coutAR_ = (i >= config::configuration().tnvacouDIE().size() || config::configuration().tnvacouDIE()[i] == config::constants::valdef)
+                            ? config::configuration().costFailure()
+                            : config::configuration().tnvacouDIE()[i];
             LOG(debug) << "le cout a la baisse AR : " << conso->nom_ << " est remis a jour a son etat de base";
         }
 
@@ -2239,6 +2403,13 @@ int Reseau::resetReseau(const std::shared_ptr<Variante>& var, bool toutesConsos)
             LOG(debug) << "la Pmax de la liaison HVDC : " << lcc->nom_ << " est remis a jour a son etat de base";
         }
 
+        for (auto lccIt = var->dcVariantCost_.cbegin(); lccIt != var->dcVariantCost_.end(); ++lccIt) {
+            const auto& lcc = lccIt->first;
+            lcc->coutLigneCC_ = 0.0;
+
+            LOG(debug) << "le coût de la liaison HVDC : " << lcc->nom_ << " est remis a jour a son etat de base";
+        }
+
         // XI-puissance de consigne des HVDC
         //----------------------------------
         for (auto lccIt = var->dcPuissImp_.cbegin(); lccIt != var->dcPuissImp_.end(); ++lccIt) {
@@ -2257,6 +2428,13 @@ int Reseau::resetReseau(const std::shared_ptr<Variante>& var, bool toutesConsos)
             td->puiCons_ = td->puiConsBase_;
 
             LOG(debug) << "le dephasage du TD : " << td->quadVrai_->nom_ << " est remis a jour a son etat de base";
+        }
+
+        for (auto tdIt = var->tdVariantCost_.cbegin(); tdIt != var->tdVariantCost_.end(); ++tdIt) {
+            const auto& td = tdIt->first;
+            td->coutTD_ = 0.0;
+
+            LOG(debug) << "le coût du TD: " << td->num_ << " est remis a jour a son etat de base";
         }
 
         // XIV - Bilans zonaux
@@ -2282,6 +2460,66 @@ int Reseau::resetReseau(const std::shared_ptr<Variante>& var, bool toutesConsos)
             const auto& icdt = icIt->first;
             icdt->probabilite_ = icdt->probabiliteBase_;
         }
+
+        // XVI - Coût des productions (hausse, baisse ; HR, AR) (POUR TNRs SEULEMENT)
+        //--------------------
+        if(config::configuration().displayRAZGroupes()){
+            for (auto group = var->grpBaisseHR_.cbegin(); group != var->grpBaisseHR_.end(); ++group){
+                const auto& grp = group->first;
+                grp->coutBaisseHR_ = grp->coutBaisseHRBase_;
+            }
+            for (auto group = var->grpBaisseAR_.cbegin(); group != var->grpBaisseAR_.end(); ++group){
+                const auto& grp = group->first;
+                grp->coutBaisseAR_ = grp->coutBaisseARBase_;
+            }
+            for (auto group = var->grpHausseHR_.cbegin(); group != var->grpHausseHR_.end(); ++group){
+                const auto& grp = group->first;
+                grp->coutHausseHR_ = grp->coutHausseHRBase_;
+            }
+            for (auto group = var->grpHausseAR_.cbegin(); group != var->grpHausseAR_.end(); ++group){
+                const auto& grp = group->first;
+                grp->coutHausseAR_ = grp->coutHausseARBase_;
+            }
+        }
+
+        // XVII - Coût des groupes à la hausse en curatif (POUR TNRs SEULEMENT)
+        //--------------------
+        for (auto icIt = var->usedCurativeGroupH_.cbegin(); icIt != var->usedCurativeGroupH_.end(); ++icIt) {
+            for(unsigned int i = 0; i != icIt->second.size(); ++i){
+                std::shared_ptr<ElementCuratifGroupe> elemCurGrp = std::get<0>(icIt->second[i]);
+                elemCurGrp->coutHausse_ = -config::constants::valdef;
+            }
+        }
+
+        // XVIII - Coût des groupes à la baisse en curatif (POUR TNRs SEULEMENT)
+        //--------------------
+        for (auto icIt = var->usedCurativeGroupB_.cbegin(); icIt != var->usedCurativeGroupB_.end(); ++icIt) {
+            for (unsigned int i = 0; i != icIt->second.size(); ++i){
+                std::shared_ptr<ElementCuratifGroupe> elemCurGrp = std::get<0>(icIt->second[i]);
+                elemCurGrp->coutBaisse_ = -config::constants::valdef;
+            }
+        }
+
+        // XVIV - Coût des TD en curatif (POUR TNRs SEULEMENT)
+        //--------------------
+        for (auto icIt = var->usedCurativeTD_.cbegin(); icIt != var->usedCurativeTD_.end(); ++icIt) {
+            for (unsigned int i = 0; i != icIt->second.size(); ++i){
+                std::shared_ptr<ElementCuratifTD> elemCurGrp = std::get<0>(icIt->second[i]);
+                elemCurGrp->coutBaisse_ = -config::constants::valdef;
+                elemCurGrp->coutHausse_ = -config::constants::valdef;
+            }
+        }
+
+        // XVV - Coût des HVDC en curatif (POUR TNRs SEULEMENT)
+        //--------------------
+        for (auto icIt = var->usedCurativeHVDC_.cbegin(); icIt != var->usedCurativeHVDC_.end(); ++icIt) {
+            for (unsigned int i = 0; i != icIt->second.size(); ++i){
+                std::shared_ptr<ElementCuratifHVDC> elemCurGrp = std::get<0>(icIt->second[i]);
+                elemCurGrp->coutBaisse_ = -config::constants::valdef;
+                elemCurGrp->coutHausse_ = -config::constants::valdef;
+            }
+        }
+
     }
 
     // Reset des consos nodales
@@ -2586,10 +2824,22 @@ void Reseau::updateBase(const config::VariantConfiguration::VariantConfig& confi
                 auto var_dbl = std::get<VariantConfiguration::VALUE>(group);
 
                 switch (cost.first) {
-                    case VariantConfiguration::VariantConfig::CostType::UP_HR: grp->coutHausseHR_ = var_dbl; break;
-                    case VariantConfiguration::VariantConfig::CostType::DOWN_HR: grp->coutBaisseHR_ = var_dbl; break;
-                    case VariantConfiguration::VariantConfig::CostType::UP_AR: grp->coutHausseAR_ = var_dbl; break;
-                    case VariantConfiguration::VariantConfig::CostType::DOWN_AR: grp->coutBaisseAR_ = var_dbl; break;
+                    case VariantConfiguration::VariantConfig::CostType::UP_HR: 
+                        grp->coutHausseHR_ = var_dbl;
+                        grp->coutHausseHRBase_ = var_dbl; 
+                        break;
+                    case VariantConfiguration::VariantConfig::CostType::DOWN_HR: 
+                        grp->coutBaisseHR_ = var_dbl;
+                        grp->coutBaisseHRBase_ = var_dbl; 
+                        break;
+                    case VariantConfiguration::VariantConfig::CostType::UP_AR: 
+                        grp->coutHausseAR_ = var_dbl;
+                        grp->coutHausseARBase_ = var_dbl;
+                        break;
+                    case VariantConfiguration::VariantConfig::CostType::DOWN_AR: 
+                        grp->coutBaisseAR_ = var_dbl; 
+                        grp->coutBaisseARBase_ = var_dbl;
+                        break;
                     default:
                         // impossible case
                         break;
@@ -2718,6 +2968,26 @@ void Reseau::updateBase(const config::VariantConfiguration::VariantConfig& confi
             conso->coutEffacement_ = var_dbl;
         } else {
             LOG_ALL(warning) << err::ioDico().msg("ERRNoeudConsoIntrouvable", str, c_fmt("%d", config.num));
+        }
+    }
+
+    for (const auto& conso_cfg : config.deleteConsosCostsHr){
+        const auto& str = std::get<VariantConfiguration::NAME>(conso_cfg);
+        auto consosIt = consos_.find(str);
+        if (consosIt != consos_.end()) {
+            auto var_dbl = std::get<VariantConfiguration::VALUE>(conso_cfg);
+            const auto& conso = consosIt->second;
+            conso->cout_ = var_dbl;
+        }
+    }
+
+    for (const auto& conso_cfg : config.deleteConsosCostsAr){
+        const auto& str = std::get<VariantConfiguration::NAME>(conso_cfg);
+        auto consosIt = consos_.find(str);
+        if (consosIt != consos_.end()) {
+            auto var_dbl = std::get<VariantConfiguration::VALUE>(conso_cfg);
+            const auto& conso = consosIt->second;
+            conso->coutAR_ = var_dbl;
         }
     }
 
@@ -2883,6 +3153,23 @@ void Reseau::updateVariant(MapQuadinVar& mapping, const config::VariantConfigura
         }
     }
 
+    for (const auto& line : config.variantCostHvdc) {
+        const auto& str = std::get<VariantConfiguration::NAME>(line);
+        auto lccIt = LigneCCs_.find(str);
+        if (lccIt != LigneCCs_.end()) {
+            auto var_dbl = std::get<VariantConfiguration::VALUE>(line);
+            variant->dcVariantCost_.insert(std::pair<std::shared_ptr<LigneCC>, double>(lccIt->second, var_dbl));
+        }
+    }
+
+    for (const auto& quad : config.variantCostTd) {
+        const auto& str = std::get<VariantConfiguration::NAME>(quad);
+        auto tdIt = TransfoDephaseurs_.find(str);
+        if (tdIt != TransfoDephaseurs_.end()) {
+            auto var_dbl = std::get<VariantConfiguration::VALUE>(quad);
+            variant->tdVariantCost_.insert(std::pair<std::shared_ptr<TransformateurDephaseur>, double>(tdIt->second, var_dbl));
+        }
+    }
     for (const auto& line : config.pmaxHvdc) {
         const auto& str = std::get<VariantConfiguration::NAME>(line);
         auto lccIt = LigneCCs_.find(str);
@@ -2990,6 +3277,7 @@ void Reseau::updateVariant(MapQuadinVar& mapping, const config::VariantConfigura
             }
         }
     }
+    static const string PREC_FLOAT_TER = "%.5f";
 
     for (const auto& conso_cfg : config.deleteConsosCosts) {
         const auto& str = std::get<VariantConfiguration::NAME>(conso_cfg);
@@ -2997,6 +3285,28 @@ void Reseau::updateVariant(MapQuadinVar& mapping, const config::VariantConfigura
         if (consosIt != consos_.end()) {
             auto var_dbl = std::get<VariantConfiguration::VALUE>(conso_cfg);
             variant->coutEfface_.insert(std::pair<std::shared_ptr<Consommation>, double>(consosIt->second, var_dbl));
+        } else {
+            LOG_ALL(warning) << err::ioDico().msg("ERRNoeudConsoIntrouvable", str, c_fmt("%d", config.num));
+        }
+    }
+
+    for (const auto& conso_cfg : config.deleteConsosCostsHr) {
+        const auto& str = std::get<VariantConfiguration::NAME>(conso_cfg);
+        auto consosIt = consos_.find(str);
+        if (consosIt != consos_.end()) {
+            auto var_dbl = std::get<VariantConfiguration::VALUE>(conso_cfg);
+            variant->coutEffaceHr_.insert(std::pair<std::shared_ptr<Consommation>, double>(consosIt->second, var_dbl));
+        } else {
+            LOG_ALL(warning) << err::ioDico().msg("ERRNoeudConsoIntrouvable", str, c_fmt("%d", config.num));
+        }
+    }
+
+    for (const auto& conso_cfg : config.deleteConsosCostsAr) {
+        const auto& str = std::get<VariantConfiguration::NAME>(conso_cfg);
+        auto consosIt = consos_.find(str);
+        if (consosIt != consos_.end()) {
+            auto var_dbl = std::get<VariantConfiguration::VALUE>(conso_cfg);
+            variant->coutEffaceAr_.insert(std::pair<std::shared_ptr<Consommation>, double>(consosIt->second, var_dbl));
         } else {
             LOG_ALL(warning) << err::ioDico().msg("ERRNoeudConsoIntrouvable", str, c_fmt("%d", config.num));
         }
@@ -3028,6 +3338,116 @@ void Reseau::updateVariant(MapQuadinVar& mapping, const config::VariantConfigura
         if (icIt != incidents_.end()) {
             auto var_dbl = std::get<VariantConfiguration::VALUE>(incident);
             variant->probabinc_.insert(std::pair<std::shared_ptr<Incident>, double>(icIt->second, var_dbl));
+        } else {
+            LOG_ALL(warning) << err::ioDico().msg("ERRIncidentIntrouvable", str, c_fmt("%d", config.num));
+        }
+    }
+
+    for (const auto& incidentElemCurCost : config.usedCurativeGrpH) {
+        const auto& str = incidentElemCurCost.first;
+        auto icIt = incidents_.find(str);
+        if (icIt != incidents_.end()) {
+            for (const auto& elemCur : incidentElemCurCost.second){
+                auto incident = icIt->second;
+                auto elCur = incident->grpNameElemCur_.find(std::get<VariantConfiguration::NAME>(elemCur));
+                if (elCur != incident->grpNameElemCur_.end()){
+                    auto var_dbl = std::get<VariantConfiguration::VALUE>(elemCur);
+                    if (variant->usedCurativeGroupH_.find(incident) != variant->usedCurativeGroupH_.end()){
+                        variant->usedCurativeGroupH_[incident].push_back(std::make_tuple(elCur->second,var_dbl));
+                    }else{
+                        std::vector<std::tuple<std::shared_ptr<ElementCuratifGroupe>, double>> vect;
+                        vect.push_back(std::make_tuple(elCur->second,var_dbl));
+                        variant->usedCurativeGroupH_.insert({incident,vect});
+                    }
+                }
+                else{
+                    LOG_ALL(warning) << err::ioDico().msg("ERRElemCurIntrouvable", std::get<VariantConfiguration::NAME>(elemCur), str, c_fmt("%d", config.num));
+                }
+            }
+        } else {
+            LOG_ALL(warning) << err::ioDico().msg("ERRIncidentIntrouvable", str, c_fmt("%d", config.num));
+        }
+    }
+
+    for (const auto& incidentElemCurCost : config.usedCurativeGrpB) {
+        const auto& str = incidentElemCurCost.first;
+        auto icIt = incidents_.find(str);
+        if (icIt != incidents_.end()) {
+            for (const auto& elemCur : incidentElemCurCost.second){
+                auto incident = icIt->second;
+                auto elCur = incident->grpNameElemCur_.find(std::get<VariantConfiguration::NAME>(elemCur));
+                if (elCur != incident->grpNameElemCur_.end()){
+                    auto var_dbl = std::get<VariantConfiguration::VALUE>(elemCur);
+                    if (variant->usedCurativeGroupB_.find(incident) != variant->usedCurativeGroupB_.end()){
+                        variant->usedCurativeGroupB_[incident].push_back(std::make_tuple(elCur->second,var_dbl));
+                    }else{
+                        std::vector<std::tuple<std::shared_ptr<ElementCuratifGroupe>, double>> vect;
+                        vect.push_back(std::make_tuple(elCur->second,var_dbl));
+                        variant->usedCurativeGroupB_.insert({incident,vect});
+                    }
+                }
+                else{
+                    LOG_ALL(warning) << err::ioDico().msg("ERRElemCurIntrouvable", std::get<VariantConfiguration::NAME>(elemCur), str, c_fmt("%d", config.num));
+                }
+            }
+        } else {
+            LOG_ALL(warning) << err::ioDico().msg("ERRIncidentIntrouvable", str, c_fmt("%d", config.num));
+        }
+    }
+
+    for (const auto& incidentElemCurCost : config.usedCurativeTD) {
+        const auto& str = incidentElemCurCost.first;
+        auto icIt = incidents_.find(str);
+        if (icIt != incidents_.end()) {
+            for (const auto& elemCur : incidentElemCurCost.second){
+                auto incident = icIt->second;
+                auto td = Reseau::TransfoDephaseurs_.find(std::get<VariantConfiguration::NAME>(elemCur));
+                if (td == Reseau::TransfoDephaseurs_.end()){
+                    LOG_ALL(warning) << err::ioDico().msg("ERRElemCurIntrouvable", std::get<VariantConfiguration::NAME>(elemCur), str, c_fmt("%d", config.num));
+                    continue;
+                }
+                auto elCur = incident->tdFictifsElemCur_.find(td->second->quadVrai_);
+                if (elCur != incident->tdFictifsElemCur_.end()){
+                    auto var_dbl = std::get<VariantConfiguration::VALUE>(elemCur);
+                    if (variant->usedCurativeTD_.find(incident) != variant->usedCurativeTD_.end()){
+                        variant->usedCurativeTD_[incident].push_back(std::make_tuple(elCur->second,var_dbl));
+                    }else{
+                        std::vector<std::tuple<std::shared_ptr<ElementCuratifTD>, double>> vect;
+                        vect.push_back(std::make_tuple(elCur->second,var_dbl));
+                        variant->usedCurativeTD_.insert({incident,vect});
+                    }
+                }
+                else{
+                    LOG_ALL(warning) << err::ioDico().msg("ERRElemCurIntrouvable", std::get<VariantConfiguration::NAME>(elemCur), str, c_fmt("%d", config.num));
+                }
+            }
+        } else {
+            LOG_ALL(warning) << err::ioDico().msg("ERRIncidentIntrouvable", str, c_fmt("%d", config.num));
+        }
+    }
+
+    for (const auto& incidentElemCurCost : config.usedCurativeHVDC) {
+        const auto& str = incidentElemCurCost.first;
+        auto icIt = incidents_.find(str);
+        if (icIt != incidents_.end()) {
+            for (const auto& elemCur : incidentElemCurCost.second){
+                auto incident = icIt->second;
+                auto lcc = Reseau::LigneCCs_.find(std::get<VariantConfiguration::NAME>(elemCur));
+                auto elCur = incident->lccElemCur_.find(lcc->second);
+                if (elCur != incident->lccElemCur_.end()){
+                    auto var_dbl = std::get<VariantConfiguration::VALUE>(elemCur);
+                    if (variant->usedCurativeHVDC_.find(incident) != variant->usedCurativeHVDC_.end()){
+                        variant->usedCurativeHVDC_[incident].push_back(std::make_tuple(elCur->second,var_dbl));
+                    }else{
+                        std::vector<std::tuple<std::shared_ptr<ElementCuratifHVDC>, double>> vect;
+                        vect.push_back(std::make_tuple(elCur->second,var_dbl));
+                        variant->usedCurativeHVDC_.insert({incident,vect});
+                    }
+                }
+                else{
+                    LOG_ALL(warning) << err::ioDico().msg("ERRElemCurIntrouvable", std::get<VariantConfiguration::NAME>(elemCur), str, c_fmt("%d", config.num));
+                }
+            }
         } else {
             LOG_ALL(warning) << err::ioDico().msg("ERRIncidentIntrouvable", str, c_fmt("%d", config.num));
         }

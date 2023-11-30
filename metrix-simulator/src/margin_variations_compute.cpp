@@ -81,6 +81,7 @@ void MarginVariationMatrix::init(int nbConstraints,
             baseSize++;
         }
     }
+    std::cout<<"BaseSize : "<<baseSize<<std::endl;
     // Determine the constraint to be ignored when not all constraints are in base
     if (baseSize > 0 && nbConstraints != baseSize) {
         // We look for the contraints that can be ignored (meaning that do not involve basic variables)
@@ -89,16 +90,20 @@ void MarginVariationMatrix::init(int nbConstraints,
                 bool ignore = true;
                 for (int j = startLineIndexes[i]; j < startLineIndexes[i] + nbTermesLine[i]; ++j) {
                     if (varPosition[columnIndexes[j]] == EN_BASE && constraintsMatrixCoeffs[j] != 0) {
+                        std::cout<<"Variable dans columnIndexes["<<j<<"] est en base et de coeff de contrainte non nul"<<std::endl;
                         ignore = false;
                         break;
                     }
                 }
                 if (ignore) {
+                    std::cout<<"Constraint "<<i<<" is ignored"<<std::endl; 
                     LOG(info) << "Constraint " << i << "is ignored for base size calulation";
                     constraintsToIgnore_.push_back(i);
                 }
             }
         }
+        std::cout<<"nbConstraints = "<<nbConstraints<<std::endl;
+        std::cout<<"constraintsToIgnore = "<<constraintsToIgnore_.size()<<std::endl;
         // Throw exception when new number of constraints doesn't match baseSize
         if (nbConstraints - static_cast<int>(constraintsToIgnore_.size()) != baseSize) {
             throw Exception(baseSize);
