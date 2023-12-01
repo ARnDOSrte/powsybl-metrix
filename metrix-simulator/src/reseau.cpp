@@ -2208,6 +2208,7 @@ int Reseau::resetReseau(const std::shared_ptr<Variante>& var, bool toutesConsos)
         for (auto consosIt = var->coutEfface_.cbegin(); consosIt != var->coutEfface_.end(); ++consosIt) {
             const auto& conso = consosIt->first;
             conso->coutEffacement_ = conso->coutEffacementBase_;
+            conso->coutHR_ = conso->cout_;
 
             LOG(debug) << "le cout a la baisse AR : " << conso->nom_ << " est remis a jour a son etat de base";
         }
