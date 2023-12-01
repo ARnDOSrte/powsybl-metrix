@@ -1773,6 +1773,13 @@ int Reseau::modifReseau(const std::shared_ptr<Variante>& var)
                    << " est modife, nouvelle valeur est: " << elem.first->coutEffacement_;
     }
 
+    for (const auto& elem : var->coutEffaceHr_) {
+        elem.first->cout_ = elem.second;
+
+        LOG(debug) << "le cout d'effacement en preventif : " << elem.first->nom_
+                   << " est modife, nouvelle valeur est: " << elem.first->cout_;
+    }
+
     // X - bilan zonal en jouant sur la consommation
     //-------------------------------------------------------
     double bilanCourant = 0.0; // bilan actuel apres application de toutes les autres lois
@@ -2721,6 +2728,16 @@ void Reseau::updateBase(const config::VariantConfiguration::VariantConfig& confi
         }
     }
 
+    for (const auto& conso_cfg : config.deleteConsosCostsHr){
+        const auto& str = std::get<VariantConfiguration::NAME>(conso_cfg);
+        auto consosIt = consos_.find(str);
+        if (consosIt != consos_.end()) {
+            auto var_dbl = std::get<VariantConfiguration::VALUE>(conso_cfg);
+            const auto& conso = consosIt->second;
+            conso->coutHR_ = var_dbl;
+        }
+    }
+
     for (auto& incident : config.probas) {
         const auto& str = std::get<VariantConfiguration::NAME>(incident);
         auto icIt = incidents_.find(str);
@@ -2997,6 +3014,17 @@ void Reseau::updateVariant(MapQuadinVar& mapping, const config::VariantConfigura
         if (consosIt != consos_.end()) {
             auto var_dbl = std::get<VariantConfiguration::VALUE>(conso_cfg);
             variant->coutEfface_.insert(std::pair<std::shared_ptr<Consommation>, double>(consosIt->second, var_dbl));
+        } else {
+            LOG_ALL(warning) << err::ioDico().msg("ERRNoeudConsoIntrouvable", str, c_fmt("%d", config.num));
+        }
+    }
+
+    for (const auto& conso_cfg : config.deleteConsosCostsHr) {
+        const auto& str = std::get<VariantConfiguration::NAME>(conso_cfg);
+        auto consosIt = consos_.find(str);
+        if (consosIt != consos_.end()) {
+            auto var_dbl = std::get<VariantConfiguration::VALUE>(conso_cfg);
+            variant->coutEffaceHr_.insert(std::pair<std::shared_ptr<Consommation>, double>(consosIt->second, var_dbl));
         } else {
             LOG_ALL(warning) << err::ioDico().msg("ERRNoeudConsoIntrouvable", str, c_fmt("%d", config.num));
         }

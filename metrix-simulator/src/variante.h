@@ -49,6 +49,7 @@ public:
 
     std::map<std::shared_ptr<Consommation>, double> valeurConso_; /*consommation variable : numero conso, valeur */
     std::map<std::shared_ptr<Consommation>, double> coutEfface_;  /*cout effacement conso : numero conso, cout */
+    std::map<std::shared_ptr<Consommation>, double> coutEffaceHr_;  /*cout effacement conso : numero conso, cout preventif*/
 
     std::map<std::shared_ptr<Groupe>, double> grpHausseHR_; /*cout a la hausse HR: numero grp, valeur*/
     std::map<std::shared_ptr<Groupe>, double> grpBaisseHR_; /*cout a la baisse HR: numero grp, valeur*/

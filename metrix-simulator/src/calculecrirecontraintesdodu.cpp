@@ -417,12 +417,12 @@ int Calculer::ecrireContraintesDeBordConsosDodu()
             if (consoNodale >= 0) {
                 pbXmin_[numVar] = 0.0;
                 pbXmax_[numVar] = conso->seuil_ * consoNodale;
-                pbCoutLineaire_[numVar] = conso->cout_ + config::configuration().noiseCost() + 
+                pbCoutLineaire_[numVar] = conso->coutHR_ + config::configuration().noiseCost() + 
                                             config::configuration().adequacyCostOffset();
             } else {
                 pbXmin_[numVar] = conso->seuil_ * consoNodale;
                 pbXmax_[numVar] = 0.0;
-                pbCoutLineaire_[numVar] = -(conso->cout_ + config::configuration().noiseCost()
+                pbCoutLineaire_[numVar] = -(conso->coutHR_ + config::configuration().noiseCost()
                                             + config::configuration().adequacyCostOffset());
             }
 
@@ -4433,6 +4433,22 @@ int Calculer::fixerProdSansReseau()
             }
         }
         // mise a jour des couts des groupes pour le redispatching
+
+        for (const auto& elem : res_.consos_) {
+            const auto& conso = elem.second;
+            int numVar = conso->numVarConso_;
+            if (numVar > 0){
+                if (conso->valeur_ >= 0) {
+                    pbCoutLineaire_[numVar] = conso->cout_ + config::configuration().noiseCost() + 
+                                                config::configuration().redispatchCostOffset();
+                } else {
+                    pbCoutLineaire_[numVar] = -(conso->cout_ + config::configuration().noiseCost()
+                                                + config::configuration().redispatchCostOffset());
+                }
+            }
+        }
+    // mise à jour des couts des consos pour le redispatching (Fonctionnalité pour les tests seuls)
+
     }
     return METRIX_PAS_PROBLEME;
 }
