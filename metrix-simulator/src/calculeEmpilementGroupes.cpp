@@ -179,7 +179,6 @@ int Calculer::empilementEconomiqueDesGroupes(const std::shared_ptr<Variante>& va
 
     // utilisation de PneSolveur
     int status = METRIX_PAS_PROBLEME;
-    std::cout<<"PneSolveur : calculeEmpilementGroupes"<<std::endl;
     status = PneSolveur(UTILISATION_PC_SIMPLEXE, varianteCourante);
     if (status == METRIX_PROBLEME) {
         LOG_ALL(error) << err::ioDico().msg("ERRAppelSpx");

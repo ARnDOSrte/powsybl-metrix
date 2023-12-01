@@ -85,20 +85,8 @@ VariantConfiguration::VariantConfiguration(const std::string& pathname) :
             "COUEFF",
             std::bind(&VariantConfiguration::processCostConso, this, std::placeholders::_1, std::placeholders::_2)),
         std::make_pair(
-            "COUEFFHR",
-            std::bind(&VariantConfiguration::processCostConsoHr, this, std::placeholders::_1, std::placeholders::_2)),
-        std::make_pair(
-            "COUEFFAR",
-            std::bind(&VariantConfiguration::processCostConsoAr, this, std::placeholders::_1, std::placeholders::_2)),
-        std::make_pair(
             "QUADIN",
             std::bind(&VariantConfiguration::processLine, this, std::placeholders::_1, std::placeholders::_2)),
-        std::make_pair(
-            "COUTLCC",
-            std::bind(&VariantConfiguration::processVariantCostLCC, this, std::placeholders::_1, std::placeholders::_2)),
-        std::make_pair(
-            "COUTTD",
-            std::bind(&VariantConfiguration::processVariantCostTD, this, std::placeholders::_1, std::placeholders::_2)),
         std::make_pair(
             "DCMINPUI",
             std::bind(&VariantConfiguration::processHVDCPmin, this, std::placeholders::_1, std::placeholders::_2)),
@@ -176,23 +164,7 @@ VariantConfiguration::VariantConfiguration(const std::string& pathname) :
             std::bind(&VariantConfiguration::processRandomGroups, this, std::placeholders::_1, std::placeholders::_2)),
         std::make_pair(
             "PROBABINC",
-            std::bind(&VariantConfiguration::processProbaInc, this, std::placeholders::_1, std::placeholders::_2)),
-        std::make_pair(
-            "INCGRPCOUH",
-            std::bind(&VariantConfiguration::processUsedCurGroupH, this, std::placeholders::_1, std::placeholders::_2)),
-        std::make_pair(
-            "INCGRPCOUB",
-            std::bind(&VariantConfiguration::processUsedCurGroupB, this, std::placeholders::_1, std::placeholders::_2)),
-        std::make_pair(
-            "INCLCCCOU",
-            std::bind(&VariantConfiguration::processUsedCurHVDC, this, std::placeholders::_1, std::placeholders::_2)),
-        std::make_pair(
-            "INCTDCOU",
-            std::bind(&VariantConfiguration::processUsedCurTD, this, std::placeholders::_1, std::placeholders::_2))
-        // std::make_pair(
-        //     "PARADCOU",
-        //     std::bind(&VariantConfiguration::processUsedParade, this, std::placeholders::_1, std::placeholders::_2))
-        }
+            std::bind(&VariantConfiguration::processProbaInc, this, std::placeholders::_1, std::placeholders::_2))}
 {
     std::ifstream fic(pathname);
     if (!fic) {
@@ -373,24 +345,6 @@ void VariantConfiguration::processLine(VariantConfig& variant, std::istringstrea
     LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : line " << sub_line << " unavailable";
 }
 
-void VariantConfiguration::processVariantCostLCC(VariantConfig& variant, std::istringstream& iss) const
-{
-    auto hvdc = extractDouble(iss);
-    variant.variantCostHvdc.push_back(hvdc);
-
-    LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : hvdc " << std::get<NAME>(hvdc)
-               << " Cost at " << std::get<VALUE>(hvdc);
-}
-
-void VariantConfiguration::processVariantCostTD(VariantConfig& variant, std::istringstream& iss) const
-{
-    auto td = extractDouble(iss);
-    variant.variantCostTd.push_back(td);
-
-    LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : td " << std::get<NAME>(td)
-               << " Cost at " << std::get<VALUE>(td);
-}
-
 void VariantConfiguration::processHVDCPmax(VariantConfig& variant, std::istringstream& iss) const
 {
     auto line = extractDouble(iss);
@@ -436,24 +390,6 @@ void VariantConfiguration::processCostConso(VariantConfig& variant, std::istring
                << " delete cost at " << std::get<VALUE>(conso);
 }
 
-void VariantConfiguration::processCostConsoHr(VariantConfig& variant, std::istringstream& iss) const
-{
-    auto conso = extractDouble(iss);
-    variant.deleteConsosCostsHr.push_back(conso);
-
-    LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : conso " << std::get<NAME>(conso)
-               << " delete cost at " << std::get<VALUE>(conso);
-}
-
-void VariantConfiguration::processCostConsoAr(VariantConfig& variant, std::istringstream& iss) const
-{
-    auto conso = extractDouble(iss);
-    variant.deleteConsosCostsAr.push_back(conso);
-
-    LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : conso " << std::get<NAME>(conso)
-               << " delete cost at " << std::get<VALUE>(conso);
-}
-
 void VariantConfiguration::processBalancesConsumption(VariantConfig& variant, std::istringstream& iss) const
 {
     auto region = extractDouble(iss);
@@ -480,117 +416,6 @@ void VariantConfiguration::processProbaInc(VariantConfig& variant, std::istrings
     LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : incident " << std::get<NAME>(incident)
                << " probability at" << std::get<VALUE>(incident);
 }
-
-void VariantConfiguration::processUsedCurGroupH(VariantConfig& variant, std::istringstream& iss) const
-{
-    std::string sub_line;
-    getline(iss, sub_line, ';');
-    auto nameIncident = sub_line;
-    rtrim(nameIncident);
-
-    auto incGrpH = extractDouble(iss);
-
-    if (variant.usedCurativeGrpH.find(nameIncident) == variant.usedCurativeGrpH.end()){
-        std::vector<std::tuple<std::string,double>> vectIncGrpH;
-        vectIncGrpH.push_back(incGrpH);
-        variant.usedCurativeGrpH.insert({nameIncident, vectIncGrpH});
-    }else{
-        variant.usedCurativeGrpH[nameIncident].push_back(incGrpH);
-
-    }
-    std::cout<<"On a fini d'utiliser processUsedCurGroupH"<<std::endl;
-    LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : incident " << nameIncident
-               << " uses " << std::get<NAME>(incGrpH) << " as a curative element by increasing its power value";
-}
-
-void VariantConfiguration::processUsedCurGroupB(VariantConfig& variant, std::istringstream& iss) const
-{
-    std::string sub_line;
-    getline(iss, sub_line, ';');
-    auto nameIncident = sub_line;
-    rtrim(nameIncident);
-
-    auto incGrpB = extractDouble(iss);
-
-    if (variant.usedCurativeGrpB.find(nameIncident) == variant.usedCurativeGrpB.end()){
-        std::vector<std::tuple<std::string,double>> vectIncGrpB;
-        vectIncGrpB.push_back(incGrpB);
-        variant.usedCurativeGrpB.insert({nameIncident, vectIncGrpB});
-    }else{
-        variant.usedCurativeGrpB[nameIncident].push_back(incGrpB);
-    }
-
-    LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : incident " << nameIncident
-               << " uses " << std::get<NAME>(incGrpB) << " as a curative element by decreasing its power value";
-}
-
-void VariantConfiguration::processUsedCurTD(VariantConfig& variant, std::istringstream& iss) const
-{
-    std::string sub_line;
-    getline(iss, sub_line, ';');
-    auto nameIncident = sub_line;
-    rtrim(nameIncident);
-
-    auto incTD = extractDouble(iss);
-
-    if (variant.usedCurativeTD.find(nameIncident) == variant.usedCurativeTD.end()){
-        std::vector<std::tuple<std::string,double>> vectIncTD;
-        vectIncTD.push_back(incTD);
-        variant.usedCurativeTD.insert({nameIncident, vectIncTD});
-    }else{
-        variant.usedCurativeTD[nameIncident].push_back(incTD);
-    }
-
-    LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : incident " << nameIncident
-               << " uses " << std::get<NAME>(incTD) << " as a curative element by decreasing its power value";
-}
-
-void VariantConfiguration::processUsedCurHVDC(VariantConfig& variant, std::istringstream& iss) const
-{
-    std::string sub_line;
-    getline(iss, sub_line, ';');
-    auto nameIncident = sub_line;
-    rtrim(nameIncident);
-
-    auto incHVDC = extractDouble(iss);
-
-    if (variant.usedCurativeHVDC.find(nameIncident) == variant.usedCurativeHVDC.end()){
-        std::vector<std::tuple<std::string,double>> vectIncHVDC;
-        vectIncHVDC.push_back(incHVDC);
-        variant.usedCurativeHVDC.insert({nameIncident, vectIncHVDC});
-    }else{
-        variant.usedCurativeHVDC[nameIncident].push_back(incHVDC);
-    }
-
-    LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : incident " << nameIncident
-               << " uses " << std::get<NAME>(incHVDC) << " as a curative element by decreasing its power value";
-}
-
-// void VariantConfiguration::processUsedParade(VariantConfig& variant, std::istringstream& iss) const
-// {
-//     std::string sub_line;
-//     getline(iss, sub_line, ';');
-//     auto nameIncident = sub_line;
-//     rtrim(nameIncident);
-
-//     getline(iss, sub_line, ';');
-//     int nbCouplages = convert::toInt(sub_line);
-
-//     for (int i = 0; i < nbCouplages ; ++i){
-
-//     }
-
-//     if (variant.usedCurativeHVDC.find(nameIncident) == variant.usedCurativeHVDC.end()){
-//         std::vector<std::tuple<std::string,double>> vectIncHVDC;
-//         vectIncHVDC.push_back(incHVDC);
-//         variant.usedCurativeHVDC.insert({nameIncident, vectIncHVDC});
-//     }else{
-//         variant.usedCurativeHVDC[nameIncident].push_back(incHVDC);
-//     }
-
-//     LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : incident " << nameIncident
-//                << " uses " << std::get<NAME>(incHVDC) << " as a curative element by decreasing its power value";
-// }
 
 void VariantConfiguration::processCost(VariantConfig::CostType cost_type,
                                        VariantConfig& variant,

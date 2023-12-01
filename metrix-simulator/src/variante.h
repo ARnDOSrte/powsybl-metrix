@@ -48,23 +48,18 @@ public:
     std::map<int, double> varBilanProd_;  /* valeur de bilan d'une region a ajuster via la production */
 
     std::map<std::shared_ptr<Consommation>, double> valeurConso_; /*consommation variable : numero conso, valeur */
-    std::map<std::shared_ptr<Consommation>, double> coutEfface_;  /*cout effacement conso : numero conso, cout curatif*/
-    std::map<std::shared_ptr<Consommation>, double> coutEffaceHr_;  /*cout effacement conso : numero conso, cout preventif*/
-    std::map<std::shared_ptr<Consommation>, double> coutEffaceAr_;  /*cout effacement conso : numero conso, cout preventif*/
+    std::map<std::shared_ptr<Consommation>, double> coutEfface_;  /*cout effacement conso : numero conso, cout */
 
     std::map<std::shared_ptr<Groupe>, double> grpHausseHR_; /*cout a la hausse HR: numero grp, valeur*/
     std::map<std::shared_ptr<Groupe>, double> grpBaisseHR_; /*cout a la baisse HR: numero grp, valeur*/
     std::map<std::shared_ptr<Groupe>, double> grpHausseAR_; /*cout a la hausse AR: numero grp, valeur*/
     std::map<std::shared_ptr<Groupe>, double> grpBaisseAR_; /*cout a la baisse AR: numero grp, valeur*/
 
-    std::map<std::shared_ptr<LigneCC>, double> dcVariantCost_; /*Cout de transit sur liaisons DC (POUR TESTS SEULEMENT)*/
     std::map<std::shared_ptr<LigneCC>, double> dcPuissMin_; /*puissance minimale de liaisons DC*/
-    std::map<std::shared_ptr<LigneCC>, double> dcPuissMax_; /*puissance maximale de liaisons DC*/
+    std::map<std::shared_ptr<LigneCC>, double> dcPuissMax_; /*puissance minimale de liaisons DC*/
     std::map<std::shared_ptr<LigneCC>, double> dcPuissImp_; /*consigne de puissance imposée de la liaison DC*/
 
     std::map<std::shared_ptr<TransformateurDephaseur>, double> dtValDep_; /*dephasage initial du TD*/
-    std::map<std::shared_ptr<TransformateurDephaseur>, double> tdVariantCost_; /*Cout de transit sur TDs (POUR TESTS SEULEMENT)*/
-
 
     std::map<std::shared_ptr<Incident>, double> probabinc_; /* probabilite de défaut */
 
@@ -83,11 +78,6 @@ public:
     std::map<std::shared_ptr<ElementASurveiller>, double>
         quatitamkExOr_; /* seuil max avant curatif Ext -> Or (regime incident complexe) */
     
-    std::map<std::shared_ptr<Incident>, std::vector<std::tuple<std::shared_ptr<ElementCuratifGroupe>, double>>> usedCurativeGroupH_;
-    std::map<std::shared_ptr<Incident>, std::vector<std::tuple<std::shared_ptr<ElementCuratifGroupe>, double>>> usedCurativeGroupB_;
-    std::map<std::shared_ptr<Incident>, std::vector<std::tuple<std::shared_ptr<ElementCuratifHVDC>, double>>> usedCurativeHVDC_;
-    std::map<std::shared_ptr<Incident>, std::vector<std::tuple<std::shared_ptr<ElementCuratifTD>, double>>> usedCurativeTD_;
-    
     // Liste des groupes renvoyées par le shuffle de calculecrirecontraintesdodu.cpp en G++9:
     //(utilisée pour les tests)
     std::vector<std::shared_ptr<Groupe>> randomGroups_;
@@ -100,13 +90,9 @@ public:
     int nbBilanProd() const { return static_cast<int>(varBilanProd_.size()); }
     int nbConsommation() const { return static_cast<int>(valeurConso_.size()); }
     int nbCoutEfface() const { return static_cast<int>(coutEfface_.size()); }
-    int nbCoutEffaceHr() const { return static_cast<int>(coutEffaceHr_.size()); }
-    int nbCoutEffaceAr() const { return static_cast<int>(coutEffaceAr_.size()); }
     int nbIndispoLignes() const { return static_cast<int>(indispoLignes_.size()); }
     int nbDcPuissMin() const { return static_cast<int>(dcPuissMin_.size()); }
     int nbDcPuissMax() const { return static_cast<int>(dcPuissMax_.size()); }
-    int nbDcVariantCost() const { return static_cast<int>(dcVariantCost_.size()); }
-    int nbTdVariantCost() const { return static_cast<int>(tdVariantCost_.size()); }
     int nbDcPuissImp() const { return static_cast<int>(dcPuissImp_.size()); }
     int nbDtValDep() const { return static_cast<int>(dtValDep_.size()); }
 };

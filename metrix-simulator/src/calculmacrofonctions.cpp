@@ -251,7 +251,6 @@ int Calculer::resolutionProbleme()
     //--------------------------------
     auto mapVarEnd = variantesOrdonnees_.end();
     for (auto mapVar = variantesOrdonnees_.begin(); mapVar != mapVarEnd; ++mapVar) {
-        std::cout<<"Passage dans la boucle de variantesOrdonnees_"<<std::endl;
         const Quadripole::SetQuadripoleSortedByName& quads = mapVar->first;
 
         LOG_RES() << "\n********************************************";
@@ -305,7 +304,6 @@ int Calculer::resolutionProbleme()
         auto varEnd = mapVar->second.end();
         for (auto var = mapVar->second.begin(); var != varEnd; ++var) {
             varianteCourante_ = (*var);
-            std::cout<<"Variante n° "<<varianteCourante_->num_<<std::endl;
 
             LOG_RES() << "\n---------------------";
             LOG_RES() << "---------------------";
@@ -421,9 +419,9 @@ int Calculer::resolutionProbleme()
 
 int Calculer::PneSolveur(TypeDeSolveur typeSolveur, const std::shared_ptr<Variante>& varianteCourante)
 {
-    // if (config::inputConfiguration().printConstraintsMatrix()) {
-    printMatriceDesContraintes();
-    // }
+    if (config::inputConfiguration().printConstraintsMatrix()) {
+        printMatriceDesContraintes();
+    }
 
     // Solveur I : utilisation de PNE_SOLVEUR
     //--------------------------------------
@@ -434,7 +432,7 @@ int Calculer::PneSolveur(TypeDeSolveur typeSolveur, const std::shared_ptr<Varian
 
         // Options du solveur
         //------------------
-        pbPNE_.AffichageDesTraces = OUI_PNE;
+        pbPNE_.AffichageDesTraces = TRACES_PNE;
         pbPNE_.SortirLesDonneesDuProbleme = config::inputConfiguration().exportMPSFile() ? OUI_PNE
                                                                                          : NON_PNE; // fichier mps
         pbPNE_.FaireDuPresolve
@@ -636,16 +634,6 @@ int Calculer::resolutionUnProblemeDodu(const std::shared_ptr<Variante>& variante
     if (status == METRIX_PAS_SOLUTION) {
         return status;
     }
-    std::cout<<"EQUILIBRAGE : "<<std::endl;
-    // for (unsigned long int i = 0; i!= pbX_.size();++i){
-    //     if (pbPositionDeLaVariable_[i] == EN_BASE){
-    //         std::cout<<" Variable "<<i<<" : en base et de valeur "<<pbX_[i]<<std::endl;
-    //     }else{
-    //         if(pbX_[i] != 0){
-    //             std::cout<<"Variable "<<i<<" Hors-base : "<<pbX_[i]<<std::endl;
-    //         }
-    //     }
-    // }
 
     if (status == METRIX_PROBLEME) {
         LOG_ALL(error) << err::ioDico().msg("ERRCalcInterne") << "Probleme lors de l'appel a Pne_solveur";
@@ -733,7 +721,6 @@ int Calculer::resolutionUnProblemeDodu(const std::shared_ptr<Variante>& variante
 
         // Appel du solveur
         if (numMicroIteration_ != 1 && pbNombreDeContraintes_ > 0) {
-            std::cout<<"PneSolveur de résolutionUnProblemeDodu"<<std::endl;
             status = PneSolveur(typeSolveur_, varianteCourante);
         }
 
@@ -743,18 +730,7 @@ int Calculer::resolutionUnProblemeDodu(const std::shared_ptr<Variante>& variante
             }
             return status;
         }
-        std::cout<<"MICROITERATION N°"<<compteur<<" : "<<std::endl;
-        // for (unsigned long int i = 0; i!= pbX_.size();++i){
-        //     if (pbPositionDeLaVariable_[i] == EN_BASE){
-        //         std::cout<<" Variable "<<i<<" : en base et de valeur "<<pbX_[i]<<std::endl;
-        //     }else{
-        //         if(pbX_[i] != 0){
-        //             std::cout<<"Variable "<<i<<" Hors-base : "<<pbX_[i]<<std::endl;
-        //         }
-        //     }
-        // }
-        // std::cout<<"Nombre de contraintes : "<<pbNombreDeContraintes_<<std::endl;
-        // std::cout<<"Valeur de pbNbVarDeBaseComplementaires_  :"<<pbNbVarDeBaseComplementaires_<<std::endl;
+
         // III- mise a jour du second membre
         //*********************************
 

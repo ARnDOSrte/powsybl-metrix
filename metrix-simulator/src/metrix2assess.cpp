@@ -21,8 +21,6 @@
 #include "status.h"
 #include "variante.h"
 
-#include <iomanip>
-#include <limits>
 #include <cmath>
 #include <cstdio>
 #include <iostream>
@@ -41,34 +39,7 @@ static const string PREC_FLOAT = "%.1f";        // Doit etre coherent avec EPSIL
 static const string EMPTY_STRING;
 static const string PREC_FLOAT_BIS = "%.4f";
 static constexpr double EPSILON_SORTIES_BIS = 0.0001;
-static const string PREC_FLOAT_TER = "%.15f";
 
-double Calculer::cutDecimals(double x)
-{
-    std::stringstream stream;
-    stream << std::fixed << std::setprecision(15)<<x;
-    std::string x_string = stream.str();
-    if (x_string.find("9999") != std::string::npos and x_string.find(".") != std::string::npos){
-
-        int dot_position = x_string.find(".");
-        int substr_position = x_string.find("9999");
-        if (dot_position < substr_position){
-            if (dot_position + 1 == substr_position){
-                return x;
-            }else{
-                int precision = dot_position - substr_position;
-                if (x>=0){
-                    return x + 2*pow(10,precision);
-                }else{
-                    return x - 2*pow(10,precision);
-                }
-            }
-        }else{
-            return x;
-        }      
-    }
-    return x;
-}
 static void print_threats(FILE* file,
                           const Menace& threat_before,
                           const std::map<std::shared_ptr<Incident>, int>& constraints_incidents,
@@ -81,14 +52,14 @@ static void print_threats(FILE* file,
     if (threat_before.defaut_ != nullptr) {
         double value_transit = (fabs(threat_before.transit_) < EPSILON_SORTIES) ? 0.0 : threat_before.transit_;
         const auto& inc = threat_before.defaut_->parade_ ? threat_before.defaut_->incTraiteCur_ : threat_before.defaut_;
-        fprintf(file, "%d;%.1f;", constraints_incidents.find(inc)->second, Calculer::cutDecimals(value_transit));
+        fprintf(file, "%d;%.1f;", constraints_incidents.find(inc)->second, value_transit);
     } else {
         fprintf(file, ";;");
     }
     for (auto rit = threats.crbegin(); rit != threats.crend(); ++rit) {
         const auto& inc = rit->defaut_->parade_ ? rit->defaut_->incTraiteCur_ : rit->defaut_;
         double value_transit = (fabs(rit->transit_) < EPSILON_SORTIES) ? 0.0 : rit->transit_;
-        fprintf(file, "%d;%.1f;", constraints_incidents.find(inc)->second, Calculer::cutDecimals(value_transit));
+        fprintf(file, "%d;%.1f;", constraints_incidents.find(inc)->second, value_transit);
     }
 
     for (unsigned int j = 0; j < config::configuration().nbThreats() - threats.size(); ++j) {
@@ -297,7 +268,6 @@ int Calculer::metrix2Assess(const std::shared_ptr<Variante>& var, const vector<d
             if (typeSolveur_ == UTILISATION_PNE_SOLVEUR) {
                 // Relance avec SPX car PNE ne retourne pas la base de la solution optimale
                 LOG_ALL(info) << "Relance sans variables entieres pour le calcul de la base";
-                std::cout<<"fixerVariablesEntieres"<<std::endl;
                 fixerVariablesEntieres();
                 PneSolveur(UTILISATION_SIMPLEXE, var);
             }
@@ -492,9 +462,9 @@ int Calculer::metrix2Assess(const std::shared_ptr<Variante>& var, const vector<d
                     }
                     string resRedispatching = EMPTY_STRING;
 
-                    if (fabs(valRedispatching) >= EPSILON_SORTIES_BIS) {
+                    if (fabs(valRedispatching) >= EPSILON_SORTIES) {
                         volDel += valRedispatching;
-                        resRedispatching = c_fmt(PREC_FLOAT_BIS.c_str(), valRedispatching);
+                        resRedispatching = c_fmt(PREC_FLOAT.c_str(), valRedispatching);
                     }
 
                     if (resEquilibrage != EMPTY_STRING || resRedispatching != EMPTY_STRING) {
@@ -661,8 +631,9 @@ int Calculer::metrix2Assess(const std::shared_ptr<Variante>& var, const vector<d
                     if (fabs(deltaHR) >= EPSILON_SORTIES_BIS) { // seuil resultat equilibrage
                         sDeltaHR = c_fmt(PREC_FLOAT_BIS.c_str(), deltaHR);
                     }
-                    if (fabs(deltaAR) >= EPSILON_SORTIES_BIS) { // seuil resultat redispatching preventif
-                        sDeltaAR = c_fmt(PREC_FLOAT_BIS.c_str(), deltaAR);
+                    if (config::configuration().displayResultatsRedispatch()
+                        && fabs(deltaAR) >= EPSILON_SORTIES) { // seuil resultat redispatching preventif
+                        sDeltaAR = c_fmt(PREC_FLOAT.c_str(), deltaAR);
                     }
 
                     if (sDeltaHR == EMPTY_STRING && sDeltaAR == EMPTY_STRING) {
@@ -865,7 +836,8 @@ int Calculer::metrix2Assess(const std::shared_ptr<Variante>& var, const vector<d
                         if (fabs(transitN) < EPSILON_SORTIES) {
                             transitN = 0.0;
                         }
-                        fprintf(fr, ("R3 ;;%s;" + PREC_FLOAT + ";\n").c_str(), quad->nom_.c_str(), Calculer::cutDecimals(transitN));
+
+                        fprintf(fr, ("R3 ;;%s;" + PREC_FLOAT + ";\n").c_str(), quad->nom_.c_str(), transitN);
                     } else {
                         fprintf(fr,
                                 "R3 ;;%s;%.1f;%.1f;%.1f;%.1f;\n",
@@ -1332,12 +1304,8 @@ int Calculer::metrix2Assess(const std::shared_ptr<Variante>& var, const vector<d
             // Information sur la parade activee
             if ((icdt->numVarActivation_ != -1) && (pbX_[icdt->numVarActivation_] > 0.5)) {
                 const auto& icdtPere = icdt->incTraiteCur_;
-                std::cout<<"On vérifie si icdt == icdtPere->parades_.begin() == PARADE_NRF"<<std::endl;
-                std::cout<<"    Nom 1ere parade incident pere : "<<icdtPere->parades_.begin()->get()->nom_<<std::endl;
-                std::cout<<"    Nom parade : "<<icdt->nom_<<std::endl;
                 if (!config::inputConfiguration().useAllOutputs() && icdt == *icdtPere->parades_.begin()) {
-                    
-                    // continue; // il n'y a que la parade ne rien faire
+                    continue; // il n'y a que la parade ne rien faire
                 }
                 fprintf(fr,
                         "R10;%d;%s;%d;%s;\n",
@@ -1409,8 +1377,7 @@ bool Calculer::calculVariationsMarginales(FILE* fr,
     vector<string> nomOu; // nom de l'ouvrage
 
     // Tableau R4
-    fprintf(fr, "R4 ;VAR. MARGINALES;LIGNE;INCIDENT;VMAR;SECTION SEUIL;\n");
-    // fprintf(fr, "R4 ;VAR. MARGINALES;LIGNE;INCIDENT;VMAR;\n");
+    fprintf(fr, "R4 ;VAR. MARGINALES;LIGNE;INCIDENT;VMAR;\n");
     int numIncident;
     vector<int> AskedDetailedConstraints;
     std::vector<int> constraintsToDelail;
@@ -1575,19 +1542,13 @@ bool Calculer::calculVariationsMarginales(FILE* fr,
         }
         string nom;
         std::tie(nom, numIncident, std::ignore) = (*opt_inc);
-        string section_seuil;
-        std::shared_ptr<Contrainte> ctre = pbContraintes_[i];
-        double transitSurContrainte = ctre->transit_;
-        std::shared_ptr<Incident> incidentSurContrainte = ctre->icdt_;
-        string nomSectionSeuil = ctre->elemAS_->nomSeuil(incidentSurContrainte, transitSurContrainte);
         double costVal = (config::configuration().redispatchCostOffset() > 0)
                              ? std::accumulate(cost[i].begin(),
                                                cost[i].end(),
                                                0.0,
                                                [](const double& sum, const CostDef& def) { return sum + def.cost; })
                              : pbCoutsMarginauxDesContraintes_[i];
-        fprintf(fr, "R4 ;;%s;%d;%.3f;%s;\n", nom.c_str(), numIncident, costVal, nomSectionSeuil.c_str());
-        // fprintf(fr, "R4 ;;%s;%d;%.3f;\n", nom.c_str(), numIncident, costVal);
+        fprintf(fr, "R4 ;;%s;%d;%.3f;\n", nom.c_str(), numIncident, costVal);
     }
     if (!AskedDetailedConstraints.empty()) {
         fprintf(fr, "R4B ;VAR. MARGINALES;LIGNE;INCIDENT;VMAR TYPVAR;NOMVAR;VOL;COUT;\n");

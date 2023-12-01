@@ -51,8 +51,6 @@ public:
         int num = variant_base;
         std::vector<double_value> consos;
         std::vector<double_value> deleteConsosCosts;
-        std::vector<double_value> deleteConsosCostsHr;
-        std::vector<double_value> deleteConsosCostsAr;
 
         std::vector<std::string> unavailableGroups;
         std::vector<double_value> groups;
@@ -62,8 +60,6 @@ public:
 
         std::vector<std::string> unavailableLines;
         std::vector<double_value> pmaxHvdc;
-        std::vector<double_value> variantCostHvdc;
-        std::vector<double_value> variantCostTd;
         std::vector<double_value> pminHvdc;
         std::vector<double_value> powerHvdc;
         std::vector<int_value> tdPhasing;
@@ -73,10 +69,6 @@ public:
         std::vector<double_value> balancesProd;
 
         std::vector<double_value> probas;
-        std::map<std::string,std::vector<double_value>> usedCurativeGrpH;
-        std::map<std::string,std::vector<double_value>> usedCurativeGrpB;
-        std::map<std::string,std::vector<double_value>> usedCurativeHVDC;
-        std::map<std::string,std::vector<double_value>> usedCurativeTD;
 
         //Stores the randomized list of groups returned by the G++9 compiler
         //Used for the testsof the CI
@@ -122,8 +114,6 @@ private:
     void processGroup(VariantConfig& variant, std::istringstream& iss) const;
     void processConso(VariantConfig& variant, std::istringstream& iss) const;
     void processCostConso(VariantConfig& variant, std::istringstream& iss) const;
-    void processCostConsoHr(VariantConfig& variant, std::istringstream& iss) const;
-    void processCostConsoAr(VariantConfig& variant, std::istringstream& iss) const;
     void processImposedGroup(VariantConfig& variant, std::istringstream& iss) const;
     void processGroupPmax(VariantConfig& variant, std::istringstream& iss) const;
     void processGroupPmin(VariantConfig& variant, std::istringstream& iss) const;
@@ -131,8 +121,6 @@ private:
     void processCost(VariantConfig::CostType cost_type, VariantConfig& variant, std::istringstream& iss) const;
 
     void processLine(VariantConfig& variant, std::istringstream& iss) const;
-    void processVariantCostLCC(VariantConfig& variant, std::istringstream& iss) const;
-    void processVariantCostTD(VariantConfig& variant, std::istringstream& iss) const;
     void processHVDCPmax(VariantConfig& variant, std::istringstream& iss) const;
     void processHVDCPmin(VariantConfig& variant, std::istringstream& iss) const;
     void processHVDCPower(VariantConfig& variant, std::istringstream& iss) const;
@@ -143,11 +131,6 @@ private:
     void processBalancesConsumption(VariantConfig& variant, std::istringstream& iss) const;
     void processBalancesProduction(VariantConfig& variant, std::istringstream& iss) const;
     void processProbaInc(VariantConfig& variant, std::istringstream& iss) const;
-    void processUsedCurGroupH(VariantConfig& variant, std::istringstream& iss) const;
-    void processUsedCurGroupB(VariantConfig& variant, std::istringstream& iss) const;
-    void processUsedCurHVDC(VariantConfig& variant, std::istringstream& iss) const;
-    void processUsedCurTD(VariantConfig& variant, std::istringstream& iss) const;
-    // void processUsedParade(VariantConfig& variant, std::istringstream& iss) const;
 
     void processRandomGroups(VariantConfig& variant, std::istringstream& iss) const;
 
