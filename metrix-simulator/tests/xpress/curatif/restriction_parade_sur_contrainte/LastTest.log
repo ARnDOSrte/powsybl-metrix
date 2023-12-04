@@ -1,0 +1,484 @@
+Start testing: Sep 04 10:04 CEST
+----------------------------------------------------------
+229/275 Testing: xpress_restriction_parade_sur_contrainte
+229/275 Test: xpress_restriction_parade_sur_contrainte
+Command: "/usr/bin/cmake" "-DEXE=/home/rohmerarn/powsybl-metrix/metrix-simulator/build/metrix_centos7/bin/metrix-simulator" "-DWORKING_DIR=/home/rohmerarn/powsybl-metrix/metrix-simulator/tests/xpress/curatif/restriction_parade_sur_contrainte" "-DEXPECTED_DIR=/home/rohmerarn/powsybl-metrix/metrix-simulator/tests/xpress_reference/curatif/restriction_parade_sur_contrainte" "-DNB_TESTS=5" "-DALL_RESULTS=1" "-DWITH_LODF_PTDF=0" "-P" "/home/rohmerarn/powsybl-metrix/metrix-simulator/cmake/tnr.cmake"
+Directory: /home/rohmerarn/powsybl-metrix/metrix-simulator/tests/xpress/curatif/restriction_parade_sur_contrainte
+"xpress_restriction_parade_sur_contrainte" start time: Sep 04 10:04 CEST
+Output:
+----------------------------------------------------------
+Passage dans la boucle de variantesOrdonnees_
+Variante n° 0
+cost_hvdc_ = 0.1 et usePenaisationHVDC() = 1
+cost_hvdc_ = 0.1 et usePenaisationHVDC() = 1
+EQUILIBRAGE : 
+MICROITERATION N°1 : 
+Variante n° 1
+cost_hvdc_ = 0.1 et usePenaisationHVDC() = 1
+cost_hvdc_ = 0.1 et usePenaisationHVDC() = 1
+EQUILIBRAGE : 
+MICROITERATION N°1 : 
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0904 10:04:05.434804 16469 xpress_interface.cc:316] XpressInterface : Initialising xpress-MP with parameter /home/rohmerarn/xpressmp/bin
+W0904 10:04:05.521635 16469 xpress_interface.cc:326] XpressInterface : Xpress banner :
+FICO Xpress Solver 64bit v8.13.0 Oct 15 2021
+(c) Copyright Fair Isaac Corporation 1983-2020. All rights reserved
+I0904 10:04:05.527913 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+I0904 10:04:05.534927 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+FICO Xpress v8.13.0, Hyper, solve started 10:04:05, Sep 4, 2023
+Heap usage: 78KB (peak 78KB, 274KB system)
+Minimizing MILP newProb using 1 thread, with these control settings:
+PRESOLVE = 1
+OUTPUTLOG = 1
+THREADS = 1
+FEASTOL = 1.e-7
+OPTIMALITYTOL = 1.e-7
+MIPRELSTOP = .0001
+Original problem has:
+         6 rows           24 cols           50 elements         4 globals
+Presolved problem has:
+         6 rows            6 cols           18 elements         4 globals
+LP relaxation tightened
+Presolve finished in 0 seconds
+Heap usage: 107KB (peak 124KB, 276KB system)
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 7.14e-02,  1.00e+04] / [ 2.50e-01,  1.44e+01]
+  RHS and bounds [min,max] : [ 1.00e+00,  1.01e+04] / [ 1.00e+00,  7.50e+01]
+  Objective      [min,max] : [ 1.00e-05,  1.10e+04] / [ 1.00e-05,  1.61e+03]
+Autoscaling applied Curtis-Reid scaling
+
+Will try to keep branch and bound tree memory usage below 29.6GB
+Crash basis containing 1 structural columns created
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0           .000000      D      2     0        .000000     0
+     5       3.00000E-05      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  5 simplex iterations in 0.00 seconds at time 0
+
+Final objective                       : 3.000000142492354e-05
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max dual violation        (abs/rel) :       0.0 /       0.0
+  Max complementarity viol. (abs/rel) :       0.0 /       0.0
+
+Starting root cutting & heuristics
+ 
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+a         3.00000E-05  3.00000E-05      1                  0.00%       0      0
+ *** Search completed ***
+Uncrunching matrix
+Final MIP objective                   : 3.000000142492354e-05
+Final MIP bound                       : 3.000000142492354e-05
+  Solution time / primaldual integral :         0s/ 99.674353%
+  Number of solutions found / nodes   :         1 /         1
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max integer violation     (abs    ) :       0.0
+Unable to refine MIP solution
+MICROITERATION N°2 : 
+Variante n° 2
+cost_hvdc_ = 0.1 et usePenaisationHVDC() = 1
+cost_hvdc_ = 0.1 et usePenaisationHVDC() = 1
+EQUILIBRAGE : 
+MICROITERATION N°1 : 
+W0904 10:04:05.563976 16469 xpress_interface.cc:316] XpressInterface : Initialising xpress-MP with parameter /home/rohmerarn/xpressmp/bin
+W0904 10:04:05.564009 16469 xpress_interface.cc:326] XpressInterface : Xpress banner :
+FICO Xpress Solver 64bit v8.13.0 Oct 15 2021
+(c) Copyright Fair Isaac Corporation 1983-2020. All rights reserved
+I0904 10:04:05.564331 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+I0904 10:04:05.565185 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+FICO Xpress v8.13.0, Hyper, solve started 10:04:05, Sep 4, 2023
+Heap usage: 78KB (peak 78KB, 282KB system)
+Minimizing MILP newProb using 1 thread, with these control settings:
+PRESOLVE = 1
+OUTPUTLOG = 1
+THREADS = 1
+FEASTOL = 1.e-7
+OPTIMALITYTOL = 1.e-7
+MIPRELSTOP = .0001
+Original problem has:
+         6 rows           24 cols           50 elements         4 globals
+Presolved problem has:
+         6 rows            9 cols           21 elements         4 globals
+LP relaxation tightened
+Presolve finished in 0 seconds
+Heap usage: 107KB (peak 124KB, 284KB system)
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 7.14e-02,  1.00e+04] / [ 2.50e-01,  2.56e+01]
+  RHS and bounds [min,max] : [ 1.00e+00,  1.01e+04] / [ 1.00e+00,  4.80e+02]
+  Objective      [min,max] : [ 1.00e-05,  1.10e+04] / [ 1.00e-05,  1.61e+03]
+Autoscaling applied Curtis-Reid scaling
+
+Will try to keep branch and bound tree memory usage below 29.6GB
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0           .000000      D      1     0        .000000     0
+     4       3.00000E-05      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  4 simplex iterations in 0.00 seconds at time 0
+
+Final objective                       : 3.000000142492354e-05
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max dual violation        (abs/rel) :       0.0 /       0.0
+  Max complementarity viol. (abs/rel) :       0.0 /       0.0
+
+Starting root cutting & heuristics
+ 
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+k         3.00000E-05  3.00000E-05      1                  0.00%       0      0
+ *** Search completed ***
+Uncrunching matrix
+Final MIP objective                   : 3.000000142492354e-05
+Final MIP bound                       : 3.000000142492354e-05
+  Solution time / primaldual integral :         0s/ 98.296811%
+  Number of solutions found / nodes   :         1 /         1
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max integer violation     (abs    ) :       0.0
+Unable to refine MIP solution
+MICROITERATION N°2 : 
+W0904 10:04:05.568568 16469 xpress_interface.cc:316] XpressInterface : Initialising xpress-MP with parameter /home/rohmerarn/xpressmp/bin
+W0904 10:04:05.568584 16469 xpress_interface.cc:326] XpressInterface : Xpress banner :
+FICO Xpress Solver 64bit v8.13.0 Oct 15 2021
+(c) Copyright Fair Isaac Corporation 1983-2020. All rights reserved
+I0904 10:04:05.568793 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+I0904 10:04:05.569413 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+FICO Xpress v8.13.0, Hyper, solve started 10:04:05, Sep 4, 2023
+Heap usage: 83KB (peak 83KB, 289KB system)
+Minimizing MILP newProb using 1 thread, with these control settings:
+PRESOLVE = 1
+OUTPUTLOG = 1
+THREADS = 1
+FEASTOL = 1.e-7
+OPTIMALITYTOL = 1.e-7
+MIPRELSTOP = .0001
+Original problem has:
+        10 rows           24 cols           79 elements         4 globals
+Presolved problem has:
+         7 rows            9 cols           24 elements         4 globals
+LP relaxation tightened
+Presolve finished in 0 seconds
+Heap usage: 110KB (peak 130KB, 291KB system)
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 3.57e-02,  1.00e+04] / [ 1.25e-01,  2.56e+01]
+  RHS and bounds [min,max] : [ 1.00e+00,  1.02e+04] / [ 1.00e+00,  4.80e+02]
+  Objective      [min,max] : [ 1.00e-05,  1.10e+04] / [ 1.00e-05,  8.04e+02]
+Autoscaling applied Curtis-Reid scaling
+
+Will try to keep branch and bound tree memory usage below 29.6GB
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0           .000000      D      1     0        .000000     0
+     6        555.101775      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  6 simplex iterations in 0.00 seconds at time 0
+
+Final objective                       : 5.551017751232147e+02
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max dual violation        (abs/rel) :       0.0 /       0.0
+  Max complementarity viol. (abs/rel) :       0.0 /       0.0
+
+Starting root cutting & heuristics
+ 
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+k          674.809085   555.101775      1                 17.74%       0      0
+ *** Search completed ***
+Uncrunching matrix
+Final MIP objective                   : 6.748090849109994e+02
+Final MIP bound                       : 6.748085298092243e+02
+  Solution time / primaldual integral :         0s/ 97.164384%
+  Number of solutions found / nodes   :         1 /         1
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max integer violation     (abs    ) : 1.388e-17
+Refined MIP solution (0.0 fractionality 0.0 abs infeasibility)
+MICROITERATION N°3 : 
+Variante n° 3
+cost_hvdc_ = 0.1 et usePenaisationHVDC() = 1
+cost_hvdc_ = 0.1 et usePenaisationHVDC() = 1
+EQUILIBRAGE : 
+MICROITERATION N°1 : 
+W0904 10:04:05.573676 16469 xpress_interface.cc:316] XpressInterface : Initialising xpress-MP with parameter /home/rohmerarn/xpressmp/bin
+W0904 10:04:05.573696 16469 xpress_interface.cc:326] XpressInterface : Xpress banner :
+FICO Xpress Solver 64bit v8.13.0 Oct 15 2021
+(c) Copyright Fair Isaac Corporation 1983-2020. All rights reserved
+I0904 10:04:05.573958 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+I0904 10:04:05.574669 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+FICO Xpress v8.13.0, Hyper, solve started 10:04:05, Sep 4, 2023
+Heap usage: 78KB (peak 78KB, 296KB system)
+Minimizing MILP newProb using 1 thread, with these control settings:
+PRESOLVE = 1
+OUTPUTLOG = 1
+THREADS = 1
+FEASTOL = 1.e-7
+OPTIMALITYTOL = 1.e-7
+MIPRELSTOP = .0001
+Original problem has:
+         6 rows           24 cols           50 elements         4 globals
+Presolved problem has:
+         5 rows            7 cols           15 elements         2 globals
+LP relaxation tightened
+Presolve finished in 0 seconds
+Heap usage: 107KB (peak 124KB, 298KB system)
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 7.14e-02,  1.00e+04] / [ 3.13e-02,  1.25e+00]
+  RHS and bounds [min,max] : [ 1.00e+00,  1.01e+04] / [ 1.00e+00,  9.60e+02]
+  Objective      [min,max] : [ 1.00e-05,  1.10e+04] / [ 1.00e-05,  1.01e+02]
+Autoscaling applied standard scaling
+
+Will try to keep branch and bound tree memory usage below 29.6GB
+ *** Solution found:  2.00000E-05   Time:   0    Heuristic: T ***
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0      -1.00000E-05      D      3     0        .000000     0
+     2       2.00000E-05      D      0     0        .000000     0
+Problem is cut off
+ *** Search completed ***
+Uncrunching matrix
+Final MIP objective                   : 2.000000094994903e-05
+Final MIP bound                       : 1.000000094994903e-05
+  Solution time / primaldual integral :         0s/ 100.000000%
+  Number of solutions found / nodes   :         1 /         0
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max integer violation     (abs    ) :       0.0
+Unable to refine MIP solution
+MICROITERATION N°2 : 
+W0904 10:04:05.578382 16469 xpress_interface.cc:316] XpressInterface : Initialising xpress-MP with parameter /home/rohmerarn/xpressmp/bin
+W0904 10:04:05.578399 16469 xpress_interface.cc:326] XpressInterface : Xpress banner :
+FICO Xpress Solver 64bit v8.13.0 Oct 15 2021
+(c) Copyright Fair Isaac Corporation 1983-2020. All rights reserved
+I0904 10:04:05.578649 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+I0904 10:04:05.579211 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+FICO Xpress v8.13.0, Hyper, solve started 10:04:05, Sep 4, 2023
+Heap usage: 83KB (peak 83KB, 303KB system)
+Minimizing MILP newProb using 1 thread, with these control settings:
+PRESOLVE = 1
+OUTPUTLOG = 1
+THREADS = 1
+FEASTOL = 1.e-7
+OPTIMALITYTOL = 1.e-7
+MIPRELSTOP = .0001
+Original problem has:
+        10 rows           24 cols           79 elements         4 globals
+Presolved problem has:
+         6 rows            8 cols           19 elements         3 globals
+LP relaxation tightened
+Presolve finished in 0 seconds
+Heap usage: 110KB (peak 130KB, 305KB system)
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 3.57e-02,  1.00e+04] / [ 3.13e-02,  1.79e+00]
+  RHS and bounds [min,max] : [ 1.00e+00,  1.01e+04] / [ 1.00e+00,  9.60e+02]
+  Objective      [min,max] : [ 1.00e-05,  1.10e+04] / [ 1.00e-05,  1.01e+02]
+Autoscaling applied standard scaling
+
+Will try to keep branch and bound tree memory usage below 29.6GB
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0           .000000      D      1     0        .000000     0
+     5       1676.622935      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  5 simplex iterations in 0.00 seconds at time 0
+
+Final objective                       : 1.676622934928243e+03
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max dual violation        (abs/rel) :       0.0 /       0.0
+  Max complementarity viol. (abs/rel) :       0.0 /       0.0
+
+Starting root cutting & heuristics
+ 
+ Its Type    BestSoln    BestBound   Sols    Add    Del     Gap     GInf   Time
+k         4024.118950  1676.622935      1                 58.34%       0      0
+   1  K   4024.118950  3409.973352      1      7      0   15.26%       3      0
+   2  K   4024.118950  3898.293058      1      5      3    3.13%       3      0
+   3  K   4024.118950  4023.611661      1      1      6    0.01%       2      0
+STOPPING - MIPRELSTOP target reached (MIPRELSTOP=0.0001  gap=3.7064e-05).
+   4  K   4024.118950  4023.969800      1     19      1    0.00%       3      0
+ 
+Cuts in the matrix         : 22
+Cut elements in the matrix : 72
+ *** Search completed ***
+Uncrunching matrix
+Final MIP objective                   : 4.024118949700156e+03
+Final MIP bound                       : 4.023969799782446e+03
+  Solution time / primaldual integral :         0s/ 62.026476%
+  Number of solutions found / nodes   :         1 /         0
+  Max primal violation      (abs/rel) : 1.110e-16 / 1.110e-16
+  Max integer violation     (abs    ) : 1.110e-16
+Refined MIP solution (0.0 fractionality 3.553e-15 abs infeasibility)
+MICROITERATION N°3 : 
+Variante n° 4
+cost_hvdc_ = 0.1 et usePenaisationHVDC() = 1
+cost_hvdc_ = 0.1 et usePenaisationHVDC() = 1
+EQUILIBRAGE : 
+MICROITERATION N°1 : 
+W0904 10:04:05.585954 16469 xpress_interface.cc:316] XpressInterface : Initialising xpress-MP with parameter /home/rohmerarn/xpressmp/bin
+W0904 10:04:05.585972 16469 xpress_interface.cc:326] XpressInterface : Xpress banner :
+FICO Xpress Solver 64bit v8.13.0 Oct 15 2021
+(c) Copyright Fair Isaac Corporation 1983-2020. All rights reserved
+I0904 10:04:05.586260 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+I0904 10:04:05.587107 16469 xpress_interface.cc:1906] Setting parameter THREADS to value 1
+FICO Xpress v8.13.0, Hyper, solve started 10:04:05, Sep 4, 2023
+Heap usage: 78KB (peak 78KB, 310KB system)
+Minimizing MILP newProb using 1 thread, with these control settings:
+PRESOLVE = 1
+OUTPUTLOG = 1
+THREADS = 1
+FEASTOL = 1.e-7
+OPTIMALITYTOL = 1.e-7
+MIPRELSTOP = .0001
+Original problem has:
+         6 rows           24 cols           50 elements         4 globals
+Presolved problem has:
+         3 rows            3 cols            6 elements         2 globals
+LP relaxation tightened
+Presolve finished in 0 seconds
+Heap usage: 106KB (peak 124KB, 312KB system)
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 7.14e-02,  1.00e+04] / [ 5.00e-01,  1.25e+00]
+  RHS and bounds [min,max] : [ 1.00e+00,  1.01e+04] / [ 1.00e+00,  2.50e+00]
+  Objective      [min,max] : [ 1.00e-05,  1.10e+04] / [ 1.00e-05,  1.61e+03]
+Autoscaling applied standard scaling
+
+Will try to keep branch and bound tree memory usage below 29.6GB
+ *** Solution found:  2.00000E-05   Time:   0    Heuristic: T ***
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0      -1.00000E-05      D      3     0        .000000     0
+     2       2.00000E-05      D      0     0        .000000     0
+Problem is cut off
+ *** Search completed ***
+Uncrunching matrix
+Final MIP objective                   : 2.000000094994903e-05
+Final MIP bound                       : 1.000000094994903e-05
+  Solution time / primaldual integral :         0s/ 100.000000%
+  Number of solutions found / nodes   :         1 /         0
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max integer violation     (abs    ) :       0.0
+MICROITERATION N°2 : 
+ 
+Reading Problem newProb
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+-- Number of output files to compare: 5
+-- Processing output file index: 0
+-- Processing output file index: 1
+-- Processing output file index: 2
+Files "/home/rohmerarn/powsybl-metrix/metrix-simulator/tests/xpress/curatif/restriction_parade_sur_contrainte/out_s2" to "/home/rohmerarn/powsybl-metrix/metrix-simulator/tests/xpress_reference/curatif/restriction_parade_sur_contrainte/out_s2" are different.
+CMake Error at /home/rohmerarn/powsybl-metrix/metrix-simulator/cmake/tnr.cmake:17 (MESSAGE):
+  File
+  /home/rohmerarn/powsybl-metrix/metrix-simulator/tests/xpress/curatif/restriction_parade_sur_contrainte/out_s2
+  is different from expected file
+  /home/rohmerarn/powsybl-metrix/metrix-simulator/tests/xpress_reference/curatif/restriction_parade_sur_contrainte/out_s2
+Call Stack (most recent call first):
+  /home/rohmerarn/powsybl-metrix/metrix-simulator/cmake/tnr.cmake:37 (check_file)
+  /home/rohmerarn/powsybl-metrix/metrix-simulator/cmake/tnr.cmake:53 (check_files)
+
+
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Failed.
+"xpress_restriction_parade_sur_contrainte" end time: Sep 04 10:04 CEST
+"xpress_restriction_parade_sur_contrainte" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Sep 04 10:04 CEST
