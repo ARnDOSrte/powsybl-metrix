@@ -638,6 +638,9 @@ void Reseau::lireDonnees()
         conso->cout_ = (i >= config.tnvacouDIE().size() || config.tnvacouDIE()[i] == config::constants::valdef)
                            ? config::configuration().costFailure()
                            : config.tnvacouDIE()[i];
+        conso->coutHR_ = (i >= config.tnvacouDIE().size() || config.tnvacouDIE()[i] == config::constants::valdef)
+                           ? config::configuration().costFailure()
+                           : config.tnvacouDIE()[i];
 
         // Lecture des incidents a traiter en curatif:
         if (config::configuration().computationType() == config::Configuration::ComputationType::OPF
