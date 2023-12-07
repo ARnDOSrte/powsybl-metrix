@@ -1777,7 +1777,7 @@ int Reseau::modifReseau(const std::shared_ptr<Variante>& var)
     }
 
     for (const auto& elem : var->coutEffaceHr_) {
-        elem.first->cout_ = elem.second;
+        elem.first->coutHR_ = elem.second;
 
         LOG(debug) << "le cout d'effacement en preventif : " << elem.first->nom_
                    << " est modife, nouvelle valeur est: " << elem.first->cout_;
@@ -2211,9 +2211,16 @@ int Reseau::resetReseau(const std::shared_ptr<Variante>& var, bool toutesConsos)
         for (auto consosIt = var->coutEfface_.cbegin(); consosIt != var->coutEfface_.end(); ++consosIt) {
             const auto& conso = consosIt->first;
             conso->coutEffacement_ = conso->coutEffacementBase_;
-            conso->coutHR_ = conso->cout_;
 
             LOG(debug) << "le cout a la baisse AR : " << conso->nom_ << " est remis a jour a son etat de base";
+        }
+
+        // Couts a la baisse des consommations (effacements)
+        for (auto consosIt = var->coutEffaceHr_.cbegin(); consosIt != var->coutEffaceHr_.end(); ++consosIt) {
+            const auto& conso = consosIt->first;
+            conso->coutHR_ = conso->cout_;
+
+            LOG(debug) << "le cout a la baisse HR : " << conso->nom_ << " est remis a jour a son etat de base";
         }
 
         // X-limitation des HVDC

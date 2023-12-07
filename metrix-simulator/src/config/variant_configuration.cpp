@@ -399,7 +399,7 @@ void VariantConfiguration::processCostConsoHr(VariantConfig& variant, std::istri
     variant.deleteConsosCostsHr.push_back(conso);
 
     LOG(debug) << metrix::log::verbose_config << "Variant " << variant.num << " : conso " << std::get<NAME>(conso)
-               << " delete cost at " << std::get<VALUE>(conso);
+               << " HR delete cost at " << std::get<VALUE>(conso);
 }
 
 void VariantConfiguration::processBalancesConsumption(VariantConfig& variant, std::istringstream& iss) const

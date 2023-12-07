@@ -452,7 +452,7 @@ int Calculer::metrix2Assess(const std::shared_ptr<Variante>& var, const vector<d
                     double valEquilibrage = pbXhR_[conso->numVarConso_];
                     double valRedispatching = pbX_[conso->numVarConso_];
 
-                    if (fabs(valEquilibrage) < EPSILON_SORTIES && fabs(valRedispatching) < EPSILON_SORTIES) {
+                    if (fabs(valEquilibrage) < EPSILON_SORTIES_BIS && fabs(valRedispatching) < EPSILON_SORTIES_BIS) {
                         continue;
                     }
 
